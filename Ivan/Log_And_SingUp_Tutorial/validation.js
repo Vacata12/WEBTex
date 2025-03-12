@@ -1,8 +1,8 @@
 const form = document.querySelector('form');
-const firstname_input = document.querySelector('#firstname-input');
-const email_input = document.querySelector('#email-input');
-const password_input = document.querySelector('#password-input');
-const confirmpassword_input = document.querySelector('#confirm-password-input');
+let firstname_input = document.querySelector('#firstname-input');
+let email_input = document.querySelector('#email-input');
+let password_input = document.querySelector('#password-input');
+let confirmpassword_input = document.querySelector('#confirm-password-input');
 
 form.addEventListener('submit', (e) => {
     let errors = [];
