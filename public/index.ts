@@ -1,19 +1,32 @@
 const uploadFile = (file: File): void => {
     const formData = new FormData();
-    formData.append("uploadFile", file); // Attach the file to the request
-
-    fetch("http://localhost:3000/api/uploadfile", {
-        method: "POST",
-        body: formData, // Send the FormData object
+    formData.append("uploadFile", file);
+  
+    fetch("http://localhost:3000/api/files/upload", {
+      method: "POST",
+      body: formData,
     })
-        .then((response) => response.text()) // Handle the server response
-        .then((data) => console.log(data)) // Log the response
-        .catch((error) => console.error("Error:", error)); // Handle errors
-};
-
-const downloadFile = (): void => {
-    fetch("http://localhost:3000/api/download")
-        .then((res) => res.text())
-        .then((data) => console.log(data)) // Log the response
-        .catch((error) => console.error("Error:", error)); // Handle errors
-};
+      .then((response) => response.text())
+      .then((data) => console.log(data))
+      .catch((error) => console.error("Error:", error));
+  };
+  
+  const downloadFile = (filename: string): void => {
+    fetch(`http://localhost:3000/api/files/download/${filename}`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("File not found");
+        }
+        return response.blob();
+      })
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      })
+      .catch((error) => console.error("Error:", error));
+  };
