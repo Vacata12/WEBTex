@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
 import dbConfig from '../config/db';
 
-// Connect to MongoDB
+
 const connectDB = async (): Promise<void> => {
   try {
-    // Correct way to use mongoose.connect with the configuration
+
     await mongoose.connect(dbConfig.connectionString, dbConfig.options);
     console.log('MongoDB connected successfully');
   } catch (error) {
@@ -13,7 +13,7 @@ const connectDB = async (): Promise<void> => {
   }
 };
 
-// Handle connection events
+
 mongoose.connection.on('error', (err) => {
   console.error('MongoDB connection error:', err);
 });

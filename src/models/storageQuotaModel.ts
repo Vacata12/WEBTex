@@ -1,11 +1,10 @@
 import mongoose, { Schema, Document } from "mongoose";
-import dbConfig from '../config/db';
 
 interface IStorageQuota extends Document {
     userId: mongoose.Types.ObjectId;
-    totalSpace: number; // Total allocated space in bytes
-    usedSpace: number; // Used space in bytes
-    plan: string; // e.g., 'free', 'premium', 'business'
+    totalSpace: number;
+    usedSpace: number; 
+    plan: string;
 }
 
 const StorageQuotaSchema: Schema = new Schema({
@@ -18,7 +17,7 @@ const StorageQuotaSchema: Schema = new Schema({
     totalSpace: {
         type: Number,
         required: true,
-        default: dbConfig.storageQuotas.free // Default from config
+        default: 15 * 1024 * 1024 * 1024
     },
     usedSpace: {
         type: Number,
@@ -34,7 +33,6 @@ const StorageQuotaSchema: Schema = new Schema({
     timestamps: true
 });
 
-// Add index for quick lookups
 StorageQuotaSchema.index({ userId: 1 });
 StorageQuotaSchema.index({ plan: 1 });
 

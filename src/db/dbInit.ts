@@ -8,18 +8,18 @@ import dbConfig from '../config/db';
 
 const initializeDatabase = async (): Promise<void> => {
   try {
-    // Connect to database
+    
     await connectDB();
     console.log('Connected to MongoDB');
 
-    // Check if we already have users in the database
+   
     const userCount = await User.countDocuments();
     if (userCount > 0) {
       console.log(`Database already contains ${userCount} users. Skipping initialization.`);
       return;
     }
 
-    // Create a default admin user
+    
     const hashedPassword = await bcrypt.hash('admin123', 10);
     const adminUser = new User({
       firstName: 'Admin',
@@ -33,7 +33,7 @@ const initializeDatabase = async (): Promise<void> => {
     const savedUser = await adminUser.save();
     console.log('Created default admin user');
 
-    // Create default storage quota for admin
+    
     const adminQuota = new StorageQuota({
       userId: savedUser._id,
       totalSpace: dbConfig.storageQuotas.business,
@@ -44,7 +44,7 @@ const initializeDatabase = async (): Promise<void> => {
     await adminQuota.save();
     console.log('Created default admin storage quota');
 
-    // Create root directory for admin
+   
     const rootDir = new File({
       name: 'root',
       type: 'directory',
@@ -62,13 +62,13 @@ const initializeDatabase = async (): Promise<void> => {
   } catch (error) {
     console.error('Database initialization failed:', error);
   } finally {
-    // Close the connection
+    
     await mongoose.connection.close();
     console.log('Database connection closed');
   }
 };
 
-// Run the initialization script if this file is executed directly
+
 if (require.main === module) {
   initializeDatabase();
 }
