@@ -2,19 +2,19 @@ import mongoose, { Schema, Document } from "mongoose";
 
 interface IFile extends Document {
     name: string;
-    type: string; // 'file' or 'directory'
+    type: string;
     path: string;
-    content?: string; // Optional content for files
-    mimeType?: string; // For files only
-    size?: number; // Size in bytes for files
+    content?: string;
+    mimeType?: string; 
+    size?: number;
     owner: mongoose.Types.ObjectId;
-    parent?: mongoose.Types.ObjectId; // Parent directory, null for root items
+    parent?: mongoose.Types.ObjectId;
     isPublic: boolean;
     lastModified: Date;
-    originalName: string; // Original filename before upload
-    storageUrl?: string; // URL or path in storage system
-    sharedWith: mongoose.Types.ObjectId[]; // Users with whom file is shared
-    starred: boolean; // For favorite files
+    originalName: string; 
+    storageUrl?: string; 
+    sharedWith: mongoose.Types.ObjectId[];
+    starred: boolean; 
 }
 
 const FileSchema: Schema = new Schema({
@@ -81,7 +81,7 @@ const FileSchema: Schema = new Schema({
     timestamps: true
 });
 
-// Index for faster queries
+
 FileSchema.index({ owner: 1, path: 1 }, { unique: true });
 FileSchema.index({ parent: 1 });
 FileSchema.index({ owner: 1 });

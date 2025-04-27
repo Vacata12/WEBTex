@@ -17,7 +17,7 @@ const dbConfig = {
   dbName: process.env.DB_NAME || '',
   webAppName: process.env.DB_WEB_APP || '',
   
-  // MongoDB connection options with proper typing
+
   options: {
     dbName: process.env.DB_NAME,
     useNewUrlParser: true,
@@ -25,7 +25,7 @@ const dbConfig = {
     autoIndex: true,
   } as MongooseConnectionOptions,
   
-  // Storage quota defaults (in bytes)
+  
   storageQuotas: {
     free: 15 * 1024 * 1024 * 1024,     // 15GB
     premium: 100 * 1024 * 1024 * 1024, // 100GB
