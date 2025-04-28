@@ -10,6 +10,7 @@ interface FileNode {
 interface SearchResult {
   path: string;
   name: string;
+  isDirectory: boolean;
 }
 
 // Main file search class
@@ -46,17 +47,18 @@ class FileSearch {
 
   // Recursive search through file tree
   private searchNode(node: FileNode, searchTerm: string, pathPrefix: string): void {
-    if (!node.isDirectory) {
-      const nodePathLower = node.path.toLowerCase();
-      const nodeNameLower = node.name.toLowerCase();
+    const nodePathLower = node.path.toLowerCase();
+    const nodeNameLower = node.name.toLowerCase();
 
-      const matchesName = nodeNameLower.includes(searchTerm);
-      const matchesPath = !pathPrefix || nodePathLower.startsWith(pathPrefix);
+    const matchesName = nodeNameLower.includes(searchTerm);
+    const matchesPath = !pathPrefix || nodePathLower.startsWith('/' + pathPrefix);
 
-      if (matchesName && matchesPath) {
-        this.searchResults.push({ path: node.path, name: node.name });
-      }
-      return;
+    if (matchesName && matchesPath) {
+      this.searchResults.push({
+        path: node.path,
+        name: node.name,
+        isDirectory: node.isDirectory
+      });
     }
 
     node.children?.forEach(child => this.searchNode(child, searchTerm, pathPrefix));
@@ -198,7 +200,21 @@ class SearchUI {
     results.forEach(result => {
       const item = document.createElement('div');
       item.className = 'dropdown-item';
-      item.textContent = `${result.name} (${result.path})`;
+      item.style.display = 'flex';
+      item.style.justifyContent = 'space-between';
+      item.style.alignItems = 'center';
+
+      const namePath = document.createElement('span');
+      namePath.textContent = `${result.name} (${result.path})`;
+      
+      const typeLabel = document.createElement('span');
+      typeLabel.textContent = result.isDirectory ? 'directory' : 'file';
+      typeLabel.style.color = result.isDirectory ? '#007bff' : '#28a745';
+      typeLabel.style.fontStyle = 'italic';
+
+      item.appendChild(namePath);
+      item.appendChild(typeLabel);
+      
       this.resultsContainer.appendChild(item);
     });
   }
