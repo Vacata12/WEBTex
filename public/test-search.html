@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Search Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    #search-input {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    #search-results {
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      max-height: 300px;
+      overflow-y: auto;
+      display: none;
+    }
+    #search-results.active {
+      display: block;
+    }
+    .dropdown-item {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+    }
+    .dropdown-item:hover {
+      background-color: #cd1818;
+    }
+  </style>
+</head>
+<body>
+  <h1>File Search Test</h1>
+  <input id="search-input" type="text" placeholder="Search files...">
+  <div id="search-results"></div>
+
+  <script type="module">
+    import { initializeSearch } from '../src/utils/fileSearch.ts';
+    
+    // Initialize search when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeSearch();
+      
+      // Show/hide results based on input
+      const searchInput = document.getElementById('search-input');
+      const resultsContainer = document.getElementById('search-results');
+      
+      searchInput.addEventListener('input', () => {
+        if (searchInput.value.trim()) {
+          resultsContainer.classList.add('active');
+        } else {
+          resultsContainer.classList.remove('active');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
