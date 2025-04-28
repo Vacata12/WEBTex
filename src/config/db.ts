@@ -1,10 +1,8 @@
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 
-// Load environment variables
 dotenv.config();
 
-// Define connection options with proper typing
 interface MongooseConnectionOptions extends mongoose.ConnectOptions {
   dbName?: string;
   useNewUrlParser?: boolean;
