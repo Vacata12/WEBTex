@@ -31,7 +31,6 @@ const dbConfig = {
   }
 };
 
-// Validate essential configuration
 if (!dbConfig.connectionString || !dbConfig.dbName) {
   console.error('Database connection string or name is not defined in environment variables');
   process.exit(1);
