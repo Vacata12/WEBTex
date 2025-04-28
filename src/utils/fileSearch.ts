@@ -28,7 +28,7 @@ class FileSearch {
   }
 
   // Main search method
-  public search(pattern: string): void {
+  public search(pattern: string, currentDir: FileNode | null = null): void {
     this.searchResults = [];
 
     const trimmedPattern = pattern.trim();
@@ -37,41 +37,31 @@ class FileSearch {
       return;
     }
 
-    const pathParts = trimmedPattern.split('/').filter(part => part.length > 0);
-    const isDirectorySearch = trimmedPattern.endsWith('/'); // Detect if it's a directory search
-    const searchTerm = (pathParts.pop() || '').toLowerCase();
-    const pathPrefix = pathParts.join('/').toLowerCase();
+    const searchTerm = trimmedPattern.toLowerCase();
 
-    this.searchNode(this.rootDir, searchTerm, pathPrefix, isDirectorySearch);
+    // If we are given a folder, search within that folder's children; otherwise, search the entire file system
+    const folderToSearch = currentDir || this.rootDir;
+
+    this.searchNode(folderToSearch, searchTerm);
     this.onResultsUpdate(this.searchResults);
   }
 
   // Recursive search through file tree
-  private searchNode(node: FileNode, searchTerm: string, pathPrefix: string, isDirectorySearch: boolean): void {
-    const nodePathLower = node.path.toLowerCase();
+  private searchNode(node: FileNode, searchTerm: string): void {
     const nodeNameLower = node.name.toLowerCase();
+    const matchesName = nodeNameLower.includes(searchTerm);
 
-    const matchesPath = !pathPrefix || nodePathLower.startsWith('/' + pathPrefix + (pathPrefix ? '/' : ''));
-    const matchesName = !searchTerm || nodeNameLower.includes(searchTerm);
-
-    // Include node if it matches the criteria
-    if (matchesName && matchesPath) {
-      if (isDirectorySearch && node.isDirectory) {
-        this.searchResults.push({
-          path: node.path,
-          name: node.name,
-          isDirectory: node.isDirectory
-        });
-      } else if (!isDirectorySearch) {
-        this.searchResults.push({
-          path: node.path,
-          name: node.name,
-          isDirectory: node.isDirectory
-        });
-      }
+    // Include node if it matches the name
+    if (matchesName) {
+      this.searchResults.push({
+        path: node.path,
+        name: node.name,
+        isDirectory: node.isDirectory
+      });
     }
 
-    node.children?.forEach(child => this.searchNode(child, searchTerm, pathPrefix, isDirectorySearch));
+    // Recurse into children
+    node.children?.forEach(child => this.searchNode(child, searchTerm));
   }
 }
 
@@ -220,8 +210,8 @@ class SearchUI {
       this.resultsContainer.appendChild(dirHeader);
 
       directories.forEach(result => {
-        const item = document.createElement('div');
-        item.className = 'dropdown-item';
+      const item = document.createElement('div');
+      item.className = 'dropdown-item';
         item.style.display = 'flex';
         item.style.justifyContent = 'space-between';
         item.style.alignItems = 'center';
@@ -269,8 +259,8 @@ class SearchUI {
         item.style.marginLeft = `${depth * 10}px`; // Adjust 10px for each level
         item.appendChild(namePath);
         item.appendChild(typeLabel);
-        this.resultsContainer.appendChild(item);
-      });
+      this.resultsContainer.appendChild(item);
+    });
     }
   }
 }
