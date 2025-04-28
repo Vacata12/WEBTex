@@ -38,30 +38,40 @@ class FileSearch {
     }
 
     const pathParts = trimmedPattern.split('/').filter(part => part.length > 0);
+    const isDirectorySearch = trimmedPattern.endsWith('/'); // Detect if it's a directory search
     const searchTerm = (pathParts.pop() || '').toLowerCase();
     const pathPrefix = pathParts.join('/').toLowerCase();
 
-    this.searchNode(this.rootDir, searchTerm, pathPrefix);
+    this.searchNode(this.rootDir, searchTerm, pathPrefix, isDirectorySearch);
     this.onResultsUpdate(this.searchResults);
   }
 
   // Recursive search through file tree
-  private searchNode(node: FileNode, searchTerm: string, pathPrefix: string): void {
+  private searchNode(node: FileNode, searchTerm: string, pathPrefix: string, isDirectorySearch: boolean): void {
     const nodePathLower = node.path.toLowerCase();
     const nodeNameLower = node.name.toLowerCase();
 
-    const matchesName = nodeNameLower.includes(searchTerm);
-    const matchesPath = !pathPrefix || nodePathLower.startsWith('/' + pathPrefix);
+    const matchesPath = !pathPrefix || nodePathLower.startsWith('/' + pathPrefix + (pathPrefix ? '/' : ''));
+    const matchesName = !searchTerm || nodeNameLower.includes(searchTerm);
 
+    // Include node if it matches the criteria
     if (matchesName && matchesPath) {
-      this.searchResults.push({
-        path: node.path,
-        name: node.name,
-        isDirectory: node.isDirectory
-      });
+      if (isDirectorySearch && node.isDirectory) {
+        this.searchResults.push({
+          path: node.path,
+          name: node.name,
+          isDirectory: node.isDirectory
+        });
+      } else if (!isDirectorySearch) {
+        this.searchResults.push({
+          path: node.path,
+          name: node.name,
+          isDirectory: node.isDirectory
+        });
+      }
     }
 
-    node.children?.forEach(child => this.searchNode(child, searchTerm, pathPrefix));
+    node.children?.forEach(child => this.searchNode(child, searchTerm, pathPrefix, isDirectorySearch));
   }
 }
 
@@ -188,7 +198,7 @@ class SearchUI {
 
   private updateResults(results: SearchResult[]): void {
     this.resultsContainer.innerHTML = '';
-  
+
     if (results.length === 0) {
       const noResults = document.createElement('div');
       noResults.textContent = this.noResultsText;
@@ -196,11 +206,11 @@ class SearchUI {
       this.resultsContainer.appendChild(noResults);
       return;
     }
-  
+
     // Separate directories and files
     const directories = results.filter(result => result.isDirectory);
     const files = results.filter(result => !result.isDirectory);
-  
+
     // Create directory section
     if (directories.length > 0) {
       const dirHeader = document.createElement('div');
@@ -208,24 +218,30 @@ class SearchUI {
       dirHeader.textContent = 'Directories:';
       dirHeader.style.fontWeight = 'bold';
       this.resultsContainer.appendChild(dirHeader);
-  
+
       directories.forEach(result => {
         const item = document.createElement('div');
         item.className = 'dropdown-item';
         item.style.display = 'flex';
         item.style.justifyContent = 'space-between';
         item.style.alignItems = 'center';
-  
+
         const namePath = document.createElement('span');
         namePath.textContent = `📁 ${result.name} (${result.path})`;
-  
+
+        const typeLabel = document.createElement('span');
+        typeLabel.textContent = 'directory';
+        typeLabel.style.color = '#007bff';
+        typeLabel.style.fontStyle = 'italic';
+
         const depth = result.path.split('/').length - 2; // Subtract 2 to account for root and first folder
         item.style.marginLeft = `${depth * 10}px`; // Adjust 10px for each level
         item.appendChild(namePath);
+        item.appendChild(typeLabel);
         this.resultsContainer.appendChild(item);
       });
     }
-  
+
     // Create file section
     if (files.length > 0) {
       const fileHeader = document.createElement('div');
@@ -233,25 +249,30 @@ class SearchUI {
       fileHeader.textContent = 'Files:';
       fileHeader.style.fontWeight = 'bold';
       this.resultsContainer.appendChild(fileHeader);
-  
+
       files.forEach(result => {
         const item = document.createElement('div');
         item.className = 'dropdown-item';
         item.style.display = 'flex';
         item.style.justifyContent = 'space-between';
         item.style.alignItems = 'center';
-  
+
         const namePath = document.createElement('span');
         namePath.textContent = `📄 ${result.name} (${result.path})`;
-  
+
+        const typeLabel = document.createElement('span');
+        typeLabel.textContent = 'file';
+        typeLabel.style.color = '#28a745';
+        typeLabel.style.fontStyle = 'italic';
+
         const depth = result.path.split('/').length - 2; // Subtract 2 to account for root and first folder
         item.style.marginLeft = `${depth * 10}px`; // Adjust 10px for each level
         item.appendChild(namePath);
+        item.appendChild(typeLabel);
         this.resultsContainer.appendChild(item);
       });
     }
   }
-  
 }
 
 // Initialize search
