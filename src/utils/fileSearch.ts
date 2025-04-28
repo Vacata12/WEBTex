@@ -188,7 +188,7 @@ class SearchUI {
 
   private updateResults(results: SearchResult[]): void {
     this.resultsContainer.innerHTML = '';
-
+  
     if (results.length === 0) {
       const noResults = document.createElement('div');
       noResults.textContent = this.noResultsText;
@@ -196,28 +196,62 @@ class SearchUI {
       this.resultsContainer.appendChild(noResults);
       return;
     }
-
-    results.forEach(result => {
-      const item = document.createElement('div');
-      item.className = 'dropdown-item';
-      item.style.display = 'flex';
-      item.style.justifyContent = 'space-between';
-      item.style.alignItems = 'center';
-
-      const namePath = document.createElement('span');
-      namePath.textContent = `${result.name} (${result.path})`;
-      
-      const typeLabel = document.createElement('span');
-      typeLabel.textContent = result.isDirectory ? 'directory' : 'file';
-      typeLabel.style.color = result.isDirectory ? '#007bff' : '#28a745';
-      typeLabel.style.fontStyle = 'italic';
-
-      item.appendChild(namePath);
-      item.appendChild(typeLabel);
-      
-      this.resultsContainer.appendChild(item);
-    });
+  
+    // Separate directories and files
+    const directories = results.filter(result => result.isDirectory);
+    const files = results.filter(result => !result.isDirectory);
+  
+    // Create directory section
+    if (directories.length > 0) {
+      const dirHeader = document.createElement('div');
+      dirHeader.className = 'dropdown-item header';
+      dirHeader.textContent = 'Directories:';
+      dirHeader.style.fontWeight = 'bold';
+      this.resultsContainer.appendChild(dirHeader);
+  
+      directories.forEach(result => {
+        const item = document.createElement('div');
+        item.className = 'dropdown-item';
+        item.style.display = 'flex';
+        item.style.justifyContent = 'space-between';
+        item.style.alignItems = 'center';
+  
+        const namePath = document.createElement('span');
+        namePath.textContent = `📁 ${result.name} (${result.path})`;
+  
+        const depth = result.path.split('/').length - 2; // Subtract 2 to account for root and first folder
+        item.style.marginLeft = `${depth * 10}px`; // Adjust 10px for each level
+        item.appendChild(namePath);
+        this.resultsContainer.appendChild(item);
+      });
+    }
+  
+    // Create file section
+    if (files.length > 0) {
+      const fileHeader = document.createElement('div');
+      fileHeader.className = 'dropdown-item header';
+      fileHeader.textContent = 'Files:';
+      fileHeader.style.fontWeight = 'bold';
+      this.resultsContainer.appendChild(fileHeader);
+  
+      files.forEach(result => {
+        const item = document.createElement('div');
+        item.className = 'dropdown-item';
+        item.style.display = 'flex';
+        item.style.justifyContent = 'space-between';
+        item.style.alignItems = 'center';
+  
+        const namePath = document.createElement('span');
+        namePath.textContent = `📄 ${result.name} (${result.path})`;
+  
+        const depth = result.path.split('/').length - 2; // Subtract 2 to account for root and first folder
+        item.style.marginLeft = `${depth * 10}px`; // Adjust 10px for each level
+        item.appendChild(namePath);
+        this.resultsContainer.appendChild(item);
+      });
+    }
   }
+  
 }
 
 // Initialize search
