@@ -1,42 +1,26 @@
-// import { Request, Response } from "express";
-// import FileModel, { IFile } from "../models/fileModel";
+import File from '../models/fileModel';
 
-// //upload file to the database
-// export const uploadFile = async (req: Request, res: Response): Promise<void> => {
-//   try {
-//     if(!req.file) {
-//       res.status(400).send("No file uploaded");
-//     }
+export const createFile = async (fileData: {
+  name: string;
+  type: string;
+  path: string;
+  owner: string;
+  parent: string | null;
+  isPublic: boolean;
+  originalName: string;
+}) => {
+  const file = new File(fileData);
+  return await file.save();
+};
 
-//     const newFile: IFile = new FileModel({
-//       filename: req.file?.originalname,
-//       data: req.file?.buffer,
-//       contentType: req.file?.mimetype,
-//     })
+export const getFileById = async (fileId: string) => {
+  return await File.findById(fileId);
+};
 
-//     await newFile.save();
-//     res.status(201).send(`File uploaded successfully ${req.file?.originalname}`);
-//   }
-//   catch (error) {
-//     res.status(500).send("Error uploading file: " + error);
-//   }
-// }
+export const updateFile = async (fileId: string, updatedData: object) => {
+  return await File.findByIdAndUpdate(fileId, updatedData, { new: true });
+};
 
-// //Download File From db
-// export const downloadFile = async (req: Request, res: Response): Promise<void> => {
-//   try {
-//     const filename = req.params.filename;
-//     const file = await FileModel.findOne({filename});
-
-//     if(!file) {
-//       res.status(404).send("File not found.");
-//       return;
-//     }
-
-//     res.set("Content-Type", file.contentType);
-//     res.send(file.data);
-//   }
-//   catch (error) {
-//     res.status(500).send("Error downloading file: " + error);
-//   }
-// }
+export const deleteFile = async (fileId: string) => {
+  return await File.findByIdAndDelete(fileId);
+};

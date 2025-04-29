@@ -15,14 +15,12 @@ const dbConfig = {
   dbName: process.env.DB_NAME || '',
   webAppName: process.env.DB_WEB_APP || '',
   
-
   options: {
     dbName: process.env.DB_NAME,
     useNewUrlParser: true,
     useUnifiedTopology: true,
     autoIndex: true,
   } as MongooseConnectionOptions,
-  
   
   storageQuotas: {
     free: 15 * 1024 * 1024 * 1024,     // 15GB
