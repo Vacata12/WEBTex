@@ -217,7 +217,7 @@ class SearchUI {
         item.style.alignItems = 'center';
 
         const namePath = document.createElement('span');
-        namePath.textContent = `📁 ${result.name} (${result.path})`;
+        namePath.textContent = `${result.name} (${result.path})`;
 
         const typeLabel = document.createElement('span');
         typeLabel.textContent = 'directory';
@@ -248,7 +248,7 @@ class SearchUI {
         item.style.alignItems = 'center';
 
         const namePath = document.createElement('span');
-        namePath.textContent = `📄 ${result.name} (${result.path})`;
+        namePath.textContent = `${result.name} (${result.path})`;
 
         const typeLabel = document.createElement('span');
         typeLabel.textContent = 'file';
