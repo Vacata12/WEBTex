@@ -1,4 +1,4 @@
-// Types for file system representation
+// Интерфейс за файл или папка
 interface FileNode {
   name: string;
   path: string;
@@ -6,14 +6,14 @@ interface FileNode {
   children?: FileNode[];
 }
 
-// Search result type
+// Интерфейс за резултат от търсене
 interface SearchResult {
   path: string;
   name: string;
   isDirectory: boolean;
 }
 
-// Main file search class
+// Клас за извършване на търсене във файлова структура
 class FileSearch {
   private rootDir: FileNode;
   private searchResults: SearchResult[] = [];
@@ -27,7 +27,7 @@ class FileSearch {
     this.onResultsUpdate = onResultsUpdate;
   }
 
-  // Main search method
+  // Основен метод за търсене по шаблон в структурата
   public search(pattern: string, currentDir: FileNode | null = null): void {
     this.searchResults = [];
 
@@ -38,20 +38,17 @@ class FileSearch {
     }
 
     const searchTerm = trimmedPattern.toLowerCase();
-
-    // If we are given a folder, search within that folder's children; otherwise, search the entire file system
     const folderToSearch = currentDir || this.rootDir;
 
     this.searchNode(folderToSearch, searchTerm);
     this.onResultsUpdate(this.searchResults);
   }
 
-  // Recursive search through file tree
+  // Рекурсивно претърсване на папки и файлове
   private searchNode(node: FileNode, searchTerm: string): void {
     const nodeNameLower = node.name.toLowerCase();
     const matchesName = nodeNameLower.includes(searchTerm);
 
-    // Include node if it matches the name
     if (matchesName) {
       this.searchResults.push({
         path: node.path,
@@ -60,12 +57,11 @@ class FileSearch {
       });
     }
 
-    // Recurse into children
     node.children?.forEach(child => this.searchNode(child, searchTerm));
   }
 }
 
-// Mock file system based on project structure
+// Примерна файлова система (макет)
 const mockFileSystem: FileNode = {
   name: 'root',
   path: '/',
@@ -154,7 +150,7 @@ const mockFileSystem: FileNode = {
   ]
 };
 
-// Example integration with a UI component
+// Клас, който управлява потребителския интерфейс на търсачката
 class SearchUI {
   private fileSearch: FileSearch;
   private searchInput: HTMLInputElement;
@@ -177,6 +173,7 @@ class SearchUI {
     this.searchInput.addEventListener('input', this.debounceInput.bind(this));
   }
 
+  // Забавя изпълнението при писане, за да не се търси веднага при всяка буква
   private debounceInput(): void {
     if (this.debounceTimeoutId) {
       clearTimeout(this.debounceTimeoutId);
@@ -186,6 +183,7 @@ class SearchUI {
     }, 200);
   }
 
+  // Обновява резултатите от търсенето в потребителския интерфейс
   private updateResults(results: SearchResult[]): void {
     this.resultsContainer.innerHTML = '';
 
@@ -197,11 +195,9 @@ class SearchUI {
       return;
     }
 
-    // Separate directories and files
     const directories = results.filter(result => result.isDirectory);
     const files = results.filter(result => !result.isDirectory);
 
-    // Create directory section
     if (directories.length > 0) {
       const dirHeader = document.createElement('div');
       dirHeader.className = 'dropdown-item header';
@@ -210,8 +206,8 @@ class SearchUI {
       this.resultsContainer.appendChild(dirHeader);
 
       directories.forEach(result => {
-      const item = document.createElement('div');
-      item.className = 'dropdown-item';
+        const item = document.createElement('div');
+        item.className = 'dropdown-item';
         item.style.display = 'flex';
         item.style.justifyContent = 'space-between';
         item.style.alignItems = 'center';
@@ -224,15 +220,14 @@ class SearchUI {
         typeLabel.style.color = '#007bff';
         typeLabel.style.fontStyle = 'italic';
 
-        const depth = result.path.split('/').length - 2; // Subtract 2 to account for root and first folder
-        item.style.marginLeft = `${depth * 10}px`; // Adjust 10px for each level
+        const depth = result.path.split('/').length - 2;
+        item.style.marginLeft = `${depth * 10}px`;
         item.appendChild(namePath);
         item.appendChild(typeLabel);
         this.resultsContainer.appendChild(item);
       });
     }
 
-    // Create file section
     if (files.length > 0) {
       const fileHeader = document.createElement('div');
       fileHeader.className = 'dropdown-item header';
@@ -255,17 +250,17 @@ class SearchUI {
         typeLabel.style.color = '#28a745';
         typeLabel.style.fontStyle = 'italic';
 
-        const depth = result.path.split('/').length - 2; // Subtract 2 to account for root and first folder
-        item.style.marginLeft = `${depth * 10}px`; // Adjust 10px for each level
+        const depth = result.path.split('/').length - 2;
+        item.style.marginLeft = `${depth * 10}px`;
         item.appendChild(namePath);
         item.appendChild(typeLabel);
-      this.resultsContainer.appendChild(item);
-    });
+        this.resultsContainer.appendChild(item);
+      });
     }
   }
 }
 
-// Initialize search
+// Стартиране на търсачката и свързване с интерфейса
 function initializeSearch(): void {
   new SearchUI(
     mockFileSystem,
@@ -274,5 +269,5 @@ function initializeSearch(): void {
   );
 }
 
-// Export for use in other modules
+// Експорт на класовете и функцията, за да могат да се използват в други файлове
 export { FileSearch, SearchUI, initializeSearch, FileNode, SearchResult };
