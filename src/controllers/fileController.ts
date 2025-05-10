@@ -1,42 +1,41 @@
-// import { Request, Response } from "express";
-// import FileModel, { IFile } from "../models/fileModel";
+import { Request, Response } from "express";
+import fileModel from "../models/fileModel";
+import mongoose from "mongoose";
+import IFile from "../models/fileModel";
 
-// //upload file to the database
-// export const uploadFile = async (req: Request, res: Response): Promise<void> => {
-//   try {
-//     if(!req.file) {
-//       res.status(400).send("No file uploaded");
-//     }
+interface MulterRequest extends Request {
+    file?: Express.Multer.File;
+}
 
-//     const newFile: IFile = new FileModel({
-//       filename: req.file?.originalname,
-//       data: req.file?.buffer,
-//       contentType: req.file?.mimetype,
-//     })
+//upload file
+export const uploadFile = async (req: Request, res: Response): Promise<void> => {
+    try {
+        if(!req.file) {
+            res.status(400).send("No file uploaded");
+        }
 
-//     await newFile.save();
-//     res.status(201).send(`File uploaded successfully ${req.file?.originalname}`);
-//   }
-//   catch (error) {
-//     res.status(500).send("Error uploading file: " + error);
-//   }
-// }
+        const { originalname, mimetype, size, buffer } = req.file as Express.Multer.File;
 
-// //Download File From db
-// export const downloadFile = async (req: Request, res: Response): Promise<void> => {
-//   try {
-//     const filename = req.params.filename;
-//     const file = await FileModel.findOne({filename});
+        const newFile = new fileModel({
+            name: req.body.name || originalname,
+            type: "file",
+            path: '/',
+            content: buffer.toString('base64'),
+            mimeType: mimetype,
+            size: size,
+            owner: new mongoose.Types.ObjectId("645b9c8f4f509b0012345678"),
+            parent: new mongoose.Types.ObjectId("645b9c8f4f509b0012345678"),
+            isPublic: false,
+            lastModified: new Date(),
+            originalName: originalname,
+            sharedWith: req.body.sharedWith || [],
+            starred: req.body.starred || false
+        });
 
-//     if(!file) {
-//       res.status(404).send("File not found.");
-//       return;
-//     }
-
-//     res.set("Content-Type", file.contentType);
-//     res.send(file.data);
-//   }
-//   catch (error) {
-//     res.status(500).send("Error downloading file: " + error);
-//   }
-// }
+        await newFile.save();
+        res.status(201).send({ message: "File uploaded successfully", file: newFile });
+    }
+    catch(error) {
+        res.status(500).send("Error uploading file: " + error);
+    }
+}
