@@ -1,6 +1,6 @@
 import express from "express";
 import multer from "multer";
-import { uploadFile } from "../controllers/fileController";
+import { uploadFile, downloadFile, deleteFile } from "../controllers/fileController";
 
 
 
@@ -9,5 +9,11 @@ const upload = multer({ storage: multer.memoryStorage() });// Configure multer a
 
 // File upload route
 router.post("/upload", upload.single("uploadFile"), uploadFile);
+
+//File download route
+router.get("/download/:id", downloadFile);
+
+//File delete route
+router.get("/delete/:id", deleteFile);
 
 export default router;
