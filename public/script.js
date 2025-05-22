@@ -17,10 +17,8 @@ async function fetchDataForBothSections(page) {
 
         const data = await response.json();
         const outputId = method === 'no-cursor' ? 'no-cursor-output' : 'with-cursor-output';
-        const timeId = method === 'no-cursor' ? 'no-cursor-time' : 'with-cursor-time';
 
         document.getElementById(outputId).textContent = JSON.stringify(data.data, null, 2);
-        document.getElementById(timeId).textContent = `Time Taken: ${data.timeTaken} ms`;
 
         // Add new data to the respective list
         if (method === 'no-cursor') {
