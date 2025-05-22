@@ -5,6 +5,16 @@ const limit = 10;
 const noCursorData = [];
 const withCursorData = [];
 
+const avgNoCursorTimeDisplay = document.createElement('p');
+avgNoCursorTimeDisplay.id = 'avg-no-cursor-time';
+avgNoCursorTimeDisplay.textContent = 'Average Time (No Cursor): - ms';
+document.body.insertBefore(avgNoCursorTimeDisplay, document.getElementById('performanceChart').parentElement);
+
+const avgWithCursorTimeDisplay = document.createElement('p');
+avgWithCursorTimeDisplay.id = 'avg-with-cursor-time';
+avgWithCursorTimeDisplay.textContent = 'Average Time (With Cursor): - ms';
+document.body.insertBefore(avgWithCursorTimeDisplay, document.getElementById('performanceChart').parentElement);
+
 async function fetchDataForBothSections(page) {
     const methods = ['no-cursor', 'with-cursor'];
 
@@ -52,6 +62,13 @@ function updateChartWithLists() {
     });
 
     performanceChart.update();
+
+    // Calculate and display the average times
+    const avgNoCursorTime = noCursorData.reduce((sum, entry) => sum + parseFloat(entry.time), 0) / noCursorData.length;
+    const avgWithCursorTime = withCursorData.reduce((sum, entry) => sum + parseFloat(entry.time), 0) / withCursorData.length;
+
+    avgNoCursorTimeDisplay.textContent = `Average Time (No Cursor): ${avgNoCursorTime.toFixed(2)} ms`;
+    avgWithCursorTimeDisplay.textContent = `Average Time (With Cursor): ${avgWithCursorTime.toFixed(2)} ms`;
 }
 
 document.getElementById('next-page').addEventListener('click', () => {
