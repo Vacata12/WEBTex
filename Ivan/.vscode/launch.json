@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "/Users/ivanstoynev/Documents/Web/Web_23_05_2025",
+      "program": "/Users/ivanstoynev/Documents/Web/Web_23_05_2025/build/Debug/outDebug"
+    }
+  ]
+}

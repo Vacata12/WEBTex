@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Items Range Query & Pagination Demo</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <h1>Items Range Query & Pagination Demo</h1>
+  <form id="queryForm">
+    <label>Min Value: <input type="number" name="minValue"></label>
+    <label>Max Value: <input type="number" name="maxValue"></label>
+    <label>Limit: <input type="number" name="limit" value="10"></label>
+    <label>Sort By:
+      <select name="sortBy">
+        <option value="createdAt">Created At</option>
+        <option value="value">Value</option>
+      </select>
+    </label>
+    <label>Sort Order:
+      <select name="sortOrder">
+        <option value="desc">Descending</option>
+        <option value="asc">Ascending</option>
+      </select>
+    </label>
+    <button type="submit">Query</button>
+  </form>
+  <div id="results"></div>
+  <button id="nextPage" style="display:none;">Next Page</button>
+  <script src="/static/app.js"></script>
+</body>
+</html>

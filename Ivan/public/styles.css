@@ -1,0 +1,42 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 2rem;
+  background: #f8f9fa;
+}
+h1 {
+  color: #333;
+}
+form {
+  margin-bottom: 1.5rem;
+  background: #fff;
+  padding: 1rem;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+label {
+  margin-right: 1rem;
+}
+#results {
+  margin-top: 1rem;
+  background: #fff;
+  padding: 1rem;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th, td {
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  text-align: left;
+}
+th {
+  background: #f1f1f1;
+}
+#nextPage {
+  margin-top: 1rem;
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+}
