@@ -17,6 +17,11 @@ app.get('/no-cursor', async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
+
+        if (page < 1 || limit < 1) {
+            return res.status(400).json({ error: 'Page and limit must be positive integers.' });
+        }
+
         const skip = (page - 1) * limit;
 
         await client.connect();
@@ -24,7 +29,11 @@ app.get('/no-cursor', async (req, res) => {
         const collection = db.collection('users');
 
         const startTime = performance.now();
-        const data = await collection.find({}).skip(skip).limit(limit).toArray();
+        const data = await collection.find({})
+            .sort({ _id: 1 }) // Ensure consistent ordering
+            .skip(skip)
+            .limit(limit)
+            .toArray();
         const endTime = performance.now();
 
         const timeTaken = (endTime - startTime).toFixed(2);
@@ -38,38 +47,48 @@ app.get('/no-cursor', async (req, res) => {
         });
     } catch (err) {
         res.status(500).json({ error: err.message });
+    } finally {
+        await client.close();
     }
 });
 
 app.get('/with-cursor', async (req, res) => {
     try {
-        const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
-        const skip = (page - 1) * limit;
+        const lastCursor = req.query.lastCursor || null; // Accept the last cursor from the query params
+
+        if (limit < 1) {
+            return res.status(400).json({ error: 'Limit must be a positive integer.' });
+        }
 
         await client.connect();
         const db = client.db(dbName);
         const collection = db.collection('users');
 
+        // Query to fetch documents after the last cursor
+        const query = lastCursor ? { _id: { $gt: new MongoClient.ObjectId(lastCursor) } } : {};
+        const options = { sort: { _id: 1 }, limit };
+
         const startTime = performance.now();
-        const cursor = collection.find({}).skip(skip).limit(limit);
-        const data = [];
-        while (await cursor.hasNext()) {
-            data.push(await cursor.next());
-        }
+        const data = await collection.find(query, options).toArray();
         const endTime = performance.now();
 
         const timeTaken = (endTime - startTime).toFixed(2);
 
+        // Determine the next cursor
+        const nextCursor = data.length > 0 ? data[data.length - 1]._id : null;
+
         res.json({
             method: 'with-cursor',
             data,
-            page,
             limit,
+            nextCursor,
             timeTaken
         });
     } catch (err) {
         res.status(500).json({ error: err.message });
+    } finally {
+        await client.close();
     }
 });
 
