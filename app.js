@@ -2,11 +2,13 @@ const express = require('express');
 const { MongoClient } = require('mongodb');
 const path = require('path');
 const { performance } = require('perf_hooks');
+const fs = require('fs');
 
 const app = express();
 const port = 3000;
 const dbName = 'demoDB';
 const client = new MongoClient('mongodb://localhost:27017');
+const logFile = path.join(__dirname, 'pagination.log');
 
 // Serve static files from the "public" folder
 app.use(express.static(path.join(__dirname, 'public')));
@@ -26,12 +28,14 @@ app.get('/no-cursor', async (req, res) => {
         const data = await collection.find({}).skip(skip).limit(limit).toArray();
         const endTime = performance.now();
 
+        const timeTaken = (endTime - startTime).toFixed(2);
+
         res.json({
             method: 'no-cursor',
             data,
             page,
             limit,
-            timeTaken: (endTime - startTime).toFixed(2)
+            timeTaken
         });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -56,12 +60,14 @@ app.get('/with-cursor', async (req, res) => {
         }
         const endTime = performance.now();
 
+        const timeTaken = (endTime - startTime).toFixed(2);
+
         res.json({
             method: 'with-cursor',
             data,
             page,
             limit,
-            timeTaken: (endTime - startTime).toFixed(2)
+            timeTaken
         });
     } catch (err) {
         res.status(500).json({ error: err.message });

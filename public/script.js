@@ -17,9 +17,6 @@ async function fetchData(method, page) {
     document.getElementById(timeId).textContent = `Time Taken: ${data.timeTaken} ms`;
 }
 
-document.getElementById('no-cursor').addEventListener('click', () => fetchData('no-cursor', noCursorPage));
-document.getElementById('with-cursor').addEventListener('click', () => fetchData('with-cursor', withCursorPage));
-
 document.getElementById('no-cursor-next').addEventListener('click', () => {
     noCursorPage++;
     fetchData('no-cursor', noCursorPage);

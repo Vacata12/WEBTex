@@ -27,7 +27,6 @@
     <div class="container">
         <div class="section">
             <h2>No Cursor</h2>
-            <button id="no-cursor">Fetch Without Cursor</button>
             <button id="no-cursor-prev">Previous Page</button>
             <button id="no-cursor-next">Next Page</button>
             <p id="no-cursor-time">Time Taken: -</p>
@@ -35,13 +34,53 @@
         </div>
         <div class="section">
             <h2>With Cursor</h2>
-            <button id="with-cursor">Fetch With Cursor</button>
             <button id="with-cursor-prev">Previous Page</button>
             <button id="with-cursor-next">Next Page</button>
             <p id="with-cursor-time">Time Taken: -</p>
             <pre id="with-cursor-output"></pre>
         </div>
     </div>
+    <div>
+        <canvas id="performanceChart" width="400" height="200"></canvas>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+        const performanceChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [], // Page numbers
+                datasets: [
+                    {
+                        label: 'No Cursor',
+                        data: [], // Time taken for no-cursor
+                        borderColor: 'red',
+                        fill: false,
+                    },
+                    {
+                        label: 'With Cursor',
+                        data: [], // Time taken for with-cursor
+                        borderColor: 'green',
+                        fill: false,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { title: { display: true, text: 'Page Number' } },
+                    y: { title: { display: true, text: 'Time Taken (ms)' } },
+                },
+            },
+        });
+
+        function updateChart(method, page, timeTaken) {
+            const datasetIndex = method === 'no-cursor' ? 0 : 1;
+            performanceChart.data.labels.push(page);
+            performanceChart.data.datasets[datasetIndex].data.push(timeTaken);
+            performanceChart.update();
+        }
+    </script>
     <script src="script.js"></script>
 </body>
 </html>
