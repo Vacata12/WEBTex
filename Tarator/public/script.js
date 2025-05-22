@@ -1,9 +1,12 @@
+console.log('Script is running');
+
 let currentPage = 1;
 const limit = 10;
 
 // Lists to store data for both methods
 const noCursorData = [];
 const withCursorData = [];
+let lastCursor = null; // To track the last cursor for the "with-cursor" method
 
 const avgNoCursorTimeDisplay = document.createElement('p');
 avgNoCursorTimeDisplay.id = 'avg-no-cursor-time';
@@ -19,7 +22,17 @@ async function fetchDataForBothSections(page) {
     const methods = ['no-cursor', 'with-cursor'];
 
     for (const method of methods) {
-        const response = await fetch(`/${method}?page=${page}&limit=${limit}`);
+        let url;
+        if (method === 'no-cursor') {
+            url = `/${method}?page=${page}&limit=${limit}`;
+        } else {
+            console.log('Using lastCursor:', lastCursor); // Debugging log
+            url = lastCursor
+                ? `/${method}?limit=${limit}&lastCursor=${lastCursor}`
+                : `/${method}?limit=${limit}`;
+        }
+
+        const response = await fetch(url);
         if (!response.ok) {
             console.error(`Error fetching data for ${method}: ${response.statusText}`);
             continue;
@@ -35,6 +48,8 @@ async function fetchDataForBothSections(page) {
             noCursorData.push({ page, time: data.timeTaken });
         } else {
             withCursorData.push({ page, time: data.timeTaken });
+            // Update the lastCursor for the next request
+            lastCursor = data.nextCursor;
         }
     }
 
@@ -54,9 +69,9 @@ function updateChartWithLists() {
         performanceChart.data.datasets[0].data.push(entry.time);
     });
 
-    withCursorData.forEach(entry => {
-        if (!performanceChart.data.labels.includes(entry.page)) {
-            performanceChart.data.labels.push(entry.page);
+    withCursorData.forEach((entry, index) => {
+        if (!performanceChart.data.labels.includes(index + 1)) {
+            performanceChart.data.labels.push(index + 1);
         }
         performanceChart.data.datasets[1].data.push(entry.time);
     });

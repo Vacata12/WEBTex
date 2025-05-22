@@ -1,5 +1,5 @@
 const express = require('express');
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb'); // Import ObjectId
 const path = require('path');
 const { performance } = require('perf_hooks');
 const fs = require('fs');
@@ -65,8 +65,17 @@ app.get('/with-cursor', async (req, res) => {
         const db = client.db(dbName);
         const collection = db.collection('users');
 
-        // Query to fetch documents after the last cursor
-        const query = lastCursor ? { _id: { $gt: new MongoClient.ObjectId(lastCursor) } } : {};
+        // Validate lastCursor
+        let query = {};
+        if (lastCursor) {
+            try {
+                query = { _id: { $gt: new ObjectId(lastCursor) } };
+            } catch (err) {
+                console.error('Invalid lastCursor:', lastCursor);
+                return res.status(400).json({ error: 'Invalid lastCursor value. Must be a valid ObjectId.' });
+            }
+        }
+
         const options = { sort: { _id: 1 }, limit };
 
         const startTime = performance.now();
@@ -76,7 +85,7 @@ app.get('/with-cursor', async (req, res) => {
         const timeTaken = (endTime - startTime).toFixed(2);
 
         // Determine the next cursor
-        const nextCursor = data.length > 0 ? data[data.length - 1]._id : null;
+        const nextCursor = data.length > 0 ? data[data.length - 1]._id.toString() : null;
 
         res.json({
             method: 'with-cursor',
@@ -86,7 +95,8 @@ app.get('/with-cursor', async (req, res) => {
             timeTaken
         });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error('Error in /with-cursor route:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
     } finally {
         await client.close();
     }
