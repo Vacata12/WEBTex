@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Pagination Demo with MongoDB</title>
+</head>
+<body>
+
+<h2>Page: <span id="currentPage">1</span> / <span id="totalPages">?</span></h2>
+<ul id="itemsList"></ul>
+
+<button id="prevPage">Previous Page</button>
+<button id="nextPage">Next Page</button>
+<button id="addItem">Add Item at Start</button>
+<button id="deleteItem">Delete Item order=2</button>
+
+<script>
+  const apiUrl = 'http://localhost:3000/items';
+  let currentPage = 1;
+  const pageSize = 3;
+  let totalPages = 1;
+
+  async function fetchPage(page) {
+    const res = await fetch(`${apiUrl}?page=${page}&pageSize=${pageSize}`);
+    const data = await res.json();
+    totalPages = data.totalPages;
+    document.getElementById('totalPages').innerText = totalPages;
+    document.getElementById('currentPage').innerText = data.page;
+
+    const ul = document.getElementById('itemsList');
+    ul.innerHTML = '';
+    data.items.forEach(i => {
+      const li = document.createElement('li');
+      li.textContent = `${i.name} (order=${i.order})`;
+      ul.appendChild(li);
+    });
+
+    currentPage = data.page;
+  }
+
+  document.getElementById('nextPage').onclick = () => {
+    if(currentPage >= totalPages) {
+      alert('No more pages ahead.');
+      return;
+    }
+    fetchPage(currentPage + 1);
+  };
+
+  document.getElementById('prevPage').onclick = () => {
+    if(currentPage <= 1) {
+      alert('Already on first page.');
+      return;
+    }
+    fetchPage(currentPage - 1);
+  };
+
+  document.getElementById('addItem').onclick = async () => {
+    await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'New Item 0' })
+    });
+    alert('Added new item at start!');
+    fetchPage(currentPage);
+  };
+
+  document.getElementById('deleteItem').onclick = async () => {
+    const response = await fetch(`${apiUrl}/2`, { method: 'DELETE' });
+    if(response.status === 404) {
+      alert('Item with order=2 does not exist!');
+    } else {
+      alert('Deleted item with order=2!');
+    }
+    fetchPage(currentPage);
+  };
+
+  // Initial load
+  fetchPage(currentPage);
+</script>
+
+</body>
+</html>
