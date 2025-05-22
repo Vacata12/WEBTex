@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "express": "^5.1.0",
+    "mongodb": "^6.16.0"
+  },
+  "scripts": {
+    "start": "node app.js",
+    "clean:all": "npm run clean:node_modules",
+    "clean:node_modules": "powershell -Command \"if (Test-Path -Path .\\node_modules) { Remove-Item -Recurse -Force .\\node_modules }\"",
+    "install:packages": "npm install"
+  },
+  "proxy": "http://localhost:3000",
+  "devDependencies": {
+    "parcel": "^2.10.0"
+  }
+}
