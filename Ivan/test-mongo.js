@@ -1,12 +1,14 @@
+require('dotenv').config();
+
 const { MongoClient } = require('mongodb');
 
-const uri = "mongodb+srv://istoynev:istoynev@cluster0.mongodb.net/Web?retryWrites=true&w=majority";
+const uri = 'mongodb://localhost:27017/';
 const client = new MongoClient(uri);
 
 async function run() {
   try {
     await client.connect();
-    const db = client.db('Web');
+    const db = client.db('ivanDB'); // Use your actual database name
     const collection = db.collection('Test');
 
     // Example: Find first 5 documents (best practice: always use projection in production)
