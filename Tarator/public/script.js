@@ -18,7 +18,7 @@ avgWithCursorTimeDisplay.id = 'avg-with-cursor-time';
 avgWithCursorTimeDisplay.textContent = 'Average Time (With Cursor): - ms';
 document.body.insertBefore(avgWithCursorTimeDisplay, document.getElementById('performanceChart').parentElement);
 
-async function fetchDataForBothSections(page) {
+async function fetchDataForBothSections(page, direction = 'forward') {
     const methods = ['no-cursor', 'with-cursor'];
 
     for (const method of methods) {
@@ -28,8 +28,8 @@ async function fetchDataForBothSections(page) {
         } else {
             console.log('Using lastCursor:', lastCursor); // Debugging log
             url = lastCursor
-                ? `/${method}?limit=${limit}&lastCursor=${lastCursor}`
-                : `/${method}?limit=${limit}`;
+                ? `/${method}?limit=${limit}&lastCursor=${lastCursor}&direction=${direction}`
+                : `/${method}?limit=${limit}&direction=${direction}`;
         }
 
         const response = await fetch(url);
@@ -49,7 +49,13 @@ async function fetchDataForBothSections(page) {
         } else {
             withCursorData.push({ page, time: data.timeTaken });
             // Update the lastCursor for the next request
-            lastCursor = data.nextCursor;
+            if (direction === 'forward') {
+                lastCursor = data.nextCursor;
+            } else if (data.data.length > 0) {
+                lastCursor = data.data[0]._id; // Use the first item's ID for backward pagination
+            } else {
+                lastCursor = null; // Reset lastCursor if no data is returned
+            }
         }
     }
 
@@ -86,15 +92,17 @@ function updateChartWithLists() {
     avgWithCursorTimeDisplay.textContent = `Average Time (With Cursor): ${avgWithCursorTime.toFixed(2)} ms`;
 }
 
+// Update event listeners for pagination
 document.getElementById('next-page').addEventListener('click', () => {
     currentPage++;
-    fetchDataForBothSections(currentPage);
+    fetchDataForBothSections(currentPage, 'forward');
 });
 
 document.getElementById('prev-page').addEventListener('click', () => {
     if (currentPage > 1) {
         currentPage--;
-        fetchDataForBothSections(currentPage);
+        lastCursor = null; // Reset lastCursor to fetch the correct data for the previous page
+        fetchDataForBothSections(currentPage, 'backward');
     }
 });
 

@@ -56,6 +56,7 @@ app.get('/with-cursor', async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 10;
         const lastCursor = req.query.lastCursor || null; // Accept the last cursor from the query params
+        const direction = req.query.direction || 'forward'; // 'forward' or 'backward'
 
         if (limit < 1) {
             return res.status(400).json({ error: 'Limit must be a positive integer.' });
@@ -65,22 +66,33 @@ app.get('/with-cursor', async (req, res) => {
         const db = client.db(dbName);
         const collection = db.collection('users');
 
-        // Validate lastCursor
+        // Build the query for forward or backward pagination
         let query = {};
+        let sort = { _id: 1 }; // Default to ascending order
         if (lastCursor) {
             try {
-                query = { _id: { $gt: new ObjectId(lastCursor) } };
+                if (direction === 'forward') {
+                    query = { _id: { $gt: new ObjectId(lastCursor) } }; // Forward pagination
+                } else if (direction === 'backward') {
+                    query = { _id: { $lt: new ObjectId(lastCursor) } }; // Backward pagination
+                    sort = { _id: -1 }; // Reverse order for backward pagination
+                }
             } catch (err) {
                 console.error('Invalid lastCursor:', lastCursor);
                 return res.status(400).json({ error: 'Invalid lastCursor value. Must be a valid ObjectId.' });
             }
         }
 
-        const options = { sort: { _id: 1 }, limit };
+        const options = { sort, limit };
 
         const startTime = performance.now();
-        const data = await collection.find(query, options).toArray();
+        let data = await collection.find(query, options).toArray();
         const endTime = performance.now();
+
+        // Reverse the data if backward pagination to maintain ascending order
+        if (direction === 'backward') {
+            data.reverse();
+        }
 
         const timeTaken = (endTime - startTime).toFixed(2);
 
