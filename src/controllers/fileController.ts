@@ -7,7 +7,8 @@ interface MulterRequest extends Request {
     file?: Express.Multer.File;
 }
 
-//upload file
+
+//upload file to db
 export const uploadFile = async (req: Request, res: Response): Promise<void> => {
     try {
         if(!req.file) {
@@ -87,4 +88,34 @@ export const deleteFile = async(req: Request, res: Response): Promise<void> => {
     catch(error) {
         res.status(500).send("Error deleting file: " + error);  
     }
+}
+
+//upload directory in work
+export const createDirectory = async(req: Request, res: Response): Promise<void> => {
+    try {
+        const { originalname, mimetype, size, buffer } = req.file as Express.Multer.File;
+
+        const newFile = new fileModel({
+            name: req.body.name || originalname,
+            type: "directory",
+            path: '/',
+            content: buffer.toString('base64'),
+            mimeType: mimetype,
+            size: size,
+            owner: new mongoose.Types.ObjectId("645b9c8f4f509b0012345678"),
+            parent: new mongoose.Types.ObjectId("645b9c8f4f509b0012345678"),
+            isPublic: false,
+            lastModified: new Date(),
+            originalName: originalname,
+            sharedWith: req.body.sharedWith || [],
+            starred: req.body.starred || false
+        });
+    }
+    catch (error) {
+        res.status(500).send("Error creating directory: " + error);  
+    }
+}
+
+export const showDataInDirectory = async(req: Request, res: Response): Promise<void> => {
+    
 }
