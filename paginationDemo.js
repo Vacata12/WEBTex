@@ -10,7 +10,7 @@ async function cursorPaginationDemo() {
         console.log('Connected to MongoDB');
 
         const db = client.db(dbName);
-        const collection = db.collection('items');
+        const collection = db.collection('users');
 
         // Cursor-based pagination
         const pageSize = 10;
@@ -39,7 +39,7 @@ async function offsetPaginationDemo() {
         console.log('Connected to MongoDB');
 
         const db = client.db(dbName);
-        const collection = db.collection('items');
+        const collection = db.collection('users');
 
         // Offset-based pagination
         const pageSize = 10;
