@@ -68,8 +68,20 @@
             options: {
                 responsive: true,
                 scales: {
-                    x: { title: { display: true, text: 'Page Number' } },
-                    y: { title: { display: true, text: 'Time Taken (ms)' } },
+                    x: { 
+                        title: { display: true, text: 'Page Number' },
+                        beginAtZero: true, // Ensure the chart starts from the beginning
+                    },
+                    y: { 
+                        title: { display: true, text: 'Time Taken (ms)' },
+                        beginAtZero: true, // Ensure the chart starts from the bottom
+                    },
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                    },
                 },
             },
         });

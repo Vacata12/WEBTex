@@ -1,6 +1,10 @@
 let currentPage = 1;
 const limit = 10;
 
+// Lists to store data for both methods
+const noCursorData = [];
+const withCursorData = [];
+
 async function fetchDataForBothSections(page) {
     const methods = ['no-cursor', 'with-cursor'];
 
@@ -18,8 +22,38 @@ async function fetchDataForBothSections(page) {
         document.getElementById(outputId).textContent = JSON.stringify(data.data, null, 2);
         document.getElementById(timeId).textContent = `Time Taken: ${data.timeTaken} ms`;
 
-        updateChart(method, page, data.timeTaken);
+        // Add new data to the respective list
+        if (method === 'no-cursor') {
+            noCursorData.push({ page, time: data.timeTaken });
+        } else {
+            withCursorData.push({ page, time: data.timeTaken });
+        }
     }
+
+    // Update the chart with the data from both lists
+    updateChartWithLists();
+}
+
+function updateChartWithLists() {
+    // Clear the chart data
+    performanceChart.data.labels = [];
+    performanceChart.data.datasets[0].data = []; // No Cursor dataset
+    performanceChart.data.datasets[1].data = []; // With Cursor dataset
+
+    // Populate the chart with data from the lists
+    noCursorData.forEach(entry => {
+        performanceChart.data.labels.push(entry.page);
+        performanceChart.data.datasets[0].data.push(entry.time);
+    });
+
+    withCursorData.forEach(entry => {
+        if (!performanceChart.data.labels.includes(entry.page)) {
+            performanceChart.data.labels.push(entry.page);
+        }
+        performanceChart.data.datasets[1].data.push(entry.time);
+    });
+
+    performanceChart.update();
 }
 
 document.getElementById('next-page').addEventListener('click', () => {
