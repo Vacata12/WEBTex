@@ -1,5 +1,7 @@
-data
-node_modules
-package-lock.json
-.vscode
 .github
+.vscode
+data
+dist
+node_modules
+npm-debug.log
+package-lock.json
