@@ -8,7 +8,6 @@ const app = express();
 const port = 3000;
 const dbName = 'demoDB';
 const client = new MongoClient('mongodb://localhost:27017');
-const logFile = path.join(__dirname, 'pagination.log');
 
 // Serve static files from the "public" folder
 app.use(express.static(path.join(__dirname, 'public')));
