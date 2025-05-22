@@ -8,8 +8,8 @@ const client = new MongoClient(uri);
 async function run() {
   try {
     await client.connect();
-    const db = client.db('ivanDB'); // Use your actual database name
-    const collection = db.collection('Test');
+    const db = client.db('demoDB'); // Use your actual database name
+    const collection = db.collection('ivanDB');
 
     // Example: Find first 5 documents (best practice: always use projection in production)
     const docs = await collection.find({}).limit(5).toArray();
