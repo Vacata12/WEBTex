@@ -11,8 +11,8 @@ const client = new MongoClient(uri);
 async function run() {
   try {
     await client.connect();
-    const db = client.db('demoDB');
-    const collection = db.collection('ivanDB');
+    const db = client.db('Web');
+    const collection = db.collection('Test');
 
     // Example: Find first 5 documents (best practice: always use projection in production)
     const docs = await collection.find({}).limit(5).toArray();
@@ -33,9 +33,8 @@ function randomDate(start, end) {
 }
 
 async function seed() {
-  await client.connect();
-    const db = client.db('demoDB');
-    const collection = db.collection('ivanDB');
+  await mongoose.connect(process.env.MONGO_URI);
+  await Item.deleteMany({});
 
   const items = [];
   for (let i = 1; i <= NUM_ITEMS; i++) {
@@ -45,7 +44,7 @@ async function seed() {
       createdAt: randomDate(new Date(Date.now() - 1000 * 60 * 60 * 24 * 30), new Date()) // random date in last 30 days
     });
   }
-  await collection.insertMany(items);
+  await Item.insertMany(items);
   console.log('Database seeded with', NUM_ITEMS, 'items!');
   mongoose.disconnect();
 }

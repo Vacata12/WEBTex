@@ -10,7 +10,7 @@ async function main() {
  
         const db = client.db("newdb"); // нова база данни
         const clients = db.collection("clients"); // нова колекция
- 
+        await clients.deleteMany({})
         await clients.insertMany([
             { firstName: "Ivan", lastName: "Ivanov", age: 28, country: "Bulgaria" },
             { firstName: "Maria", lastName: "Petrova", age: 22, country: "Bulgaria" },
