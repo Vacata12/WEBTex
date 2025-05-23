@@ -1,37 +1,59 @@
 console.log('Script is running');
 
 let currentPage = 1;
-const limit = 10;
+const limit = 1000; // Increased to 1000 records per page
 
 // Lists to store data for both methods
 const noCursorData = [];
 const withCursorData = [];
-let lastCursor = null; // To track the last cursor for the "with-cursor" method
+let forwardCursor = null;
+let backwardCursor = null;
+
+// Create performance display elements
+const performanceSection = document.createElement('div');
+performanceSection.style.marginBottom = '20px';
+performanceSection.style.padding = '10px';
+performanceSection.style.border = '1px solid #ccc';
 
 const avgNoCursorTimeDisplay = document.createElement('p');
 avgNoCursorTimeDisplay.id = 'avg-no-cursor-time';
 avgNoCursorTimeDisplay.textContent = 'Average Time (No Cursor): - ms';
-document.body.insertBefore(avgNoCursorTimeDisplay, document.getElementById('performanceChart').parentElement);
 
 const avgWithCursorTimeDisplay = document.createElement('p');
 avgWithCursorTimeDisplay.id = 'avg-with-cursor-time';
 avgWithCursorTimeDisplay.textContent = 'Average Time (With Cursor): - ms';
-document.body.insertBefore(avgWithCursorTimeDisplay, document.getElementById('performanceChart').parentElement);
+
+const currentPageDisplay = document.createElement('p');
+currentPageDisplay.id = 'current-page';
+currentPageDisplay.textContent = 'Current Page: 1';
+
+const recordsPerPageDisplay = document.createElement('p');
+recordsPerPageDisplay.textContent = `Records per page: ${limit}`;
+
+performanceSection.appendChild(currentPageDisplay);
+performanceSection.appendChild(recordsPerPageDisplay);
+performanceSection.appendChild(avgNoCursorTimeDisplay);
+performanceSection.appendChild(avgWithCursorTimeDisplay);
+
+// Insert the performance section before the chart
+document.body.insertBefore(performanceSection, document.getElementById('performanceChart').parentElement);
 
 async function fetchDataForBothSections(page, direction = 'forward') {
     const methods = ['no-cursor', 'with-cursor'];
+    currentPageDisplay.textContent = `Current Page: ${page}`;
 
     for (const method of methods) {
         let url;
         if (method === 'no-cursor') {
             url = `/${method}?page=${page}&limit=${limit}`;
         } else {
-            console.log('Using lastCursor:', lastCursor); // Debugging log
-            url = lastCursor
-                ? `/${method}?limit=${limit}&lastCursor=${lastCursor}&direction=${direction}`
+            const cursorToUse = direction === 'backward' ? backwardCursor : forwardCursor;
+            url = cursorToUse
+                ? `/${method}?limit=${limit}&lastCursor=${cursorToUse}&direction=${direction}`
                 : `/${method}?limit=${limit}&direction=${direction}`;
         }
 
+        const startTime = performance.now(); // Client-side timing start
         const response = await fetch(url);
         if (!response.ok) {
             console.error(`Error fetching data for ${method}: ${response.statusText}`);
@@ -39,27 +61,39 @@ async function fetchDataForBothSections(page, direction = 'forward') {
         }
 
         const data = await response.json();
+        const endTime = performance.now(); // Client-side timing end
+        const totalTime = data.timeTaken; // Server-side timing
+
         const outputId = method === 'no-cursor' ? 'no-cursor-output' : 'with-cursor-output';
+        const output = document.getElementById(outputId);
+        
+        // Show only first and last few items to avoid overwhelming the display
+        const displayData = {
+            totalRecords: data.data.length,
+            firstItems: data.data.slice(0, 3),
+            lastItems: data.data.slice(-3),
+            timeTaken: totalTime
+        };
+        
+        output.textContent = JSON.stringify(displayData, null, 2);
 
-        document.getElementById(outputId).textContent = JSON.stringify(data.data, null, 2);
-
-        // Add new data to the respective list
         if (method === 'no-cursor') {
-            noCursorData.push({ page, time: data.timeTaken });
+            noCursorData.push({ page, time: totalTime });
         } else {
-            withCursorData.push({ page, time: data.timeTaken });
-            // Update the lastCursor for the next request
-            if (direction === 'forward') {
-                lastCursor = data.nextCursor;
-            } else if (data.data.length > 0) {
-                lastCursor = data.data[0]._id; // Use the first item's ID for backward pagination
-            } else {
-                lastCursor = null; // Reset lastCursor if no data is returned
+            withCursorData.push({ page, time: totalTime });
+            
+            if (data.data.length > 0) {
+                if (direction === 'forward') {
+                    forwardCursor = data.nextCursor;
+                    backwardCursor = data.data[0]._id;
+                } else {
+                    backwardCursor = data.data[0]._id;
+                    forwardCursor = data.nextCursor;
+                }
             }
         }
     }
 
-    // Update the chart with the data from both lists
     updateChartWithLists();
 }
 
@@ -101,12 +135,11 @@ document.getElementById('next-page').addEventListener('click', () => {
 document.getElementById('prev-page').addEventListener('click', () => {
     if (currentPage > 1) {
         currentPage--;
-        lastCursor = null; // Reset lastCursor to fetch the correct data for the previous page
         fetchDataForBothSections(currentPage, 'backward');
     }
 });
 
-// Fetch data for both sections on page load
+// Initialize data fetching
 window.addEventListener('load', () => {
     fetchDataForBothSections(currentPage);
 });

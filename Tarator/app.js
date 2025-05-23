@@ -55,8 +55,8 @@ app.get('/no-cursor', async (req, res) => {
 app.get('/with-cursor', async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 10;
-        const lastCursor = req.query.lastCursor || null; // Accept the last cursor from the query params
-        const direction = req.query.direction || 'forward'; // 'forward' or 'backward'
+        const lastCursor = req.query.lastCursor || null;
+        const direction = req.query.direction || 'forward';
 
         if (limit < 1) {
             return res.status(400).json({ error: 'Limit must be a positive integer.' });
@@ -66,46 +66,47 @@ app.get('/with-cursor', async (req, res) => {
         const db = client.db(dbName);
         const collection = db.collection('users');
 
-        // Build the query for forward or backward pagination
         let query = {};
-        let sort = { _id: 1 }; // Default to ascending order
+        let sort = { _id: direction === 'forward' ? 1 : -1 };
+
         if (lastCursor) {
             try {
-                if (direction === 'forward') {
-                    query = { _id: { $gt: new ObjectId(lastCursor) } }; // Forward pagination
-                } else if (direction === 'backward') {
-                    query = { _id: { $lt: new ObjectId(lastCursor) } }; // Backward pagination
-                    sort = { _id: -1 }; // Reverse order for backward pagination
-                }
+                const cursor = new ObjectId(lastCursor);
+                // Use the same comparison operator based on sort direction
+                query = {
+                    _id: direction === 'forward' 
+                        ? { $gt: cursor }
+                        : { $lt: cursor }
+                };
             } catch (err) {
                 console.error('Invalid lastCursor:', lastCursor);
                 return res.status(400).json({ error: 'Invalid lastCursor value. Must be a valid ObjectId.' });
             }
         }
 
-        const options = { sort, limit };
-
         const startTime = performance.now();
-        let data = await collection.find(query, options).toArray();
+        let data = await collection.find(query)
+            .sort(sort)
+            .limit(limit)
+            .toArray();
         const endTime = performance.now();
 
-        // Reverse the data if backward pagination to maintain ascending order
         if (direction === 'backward') {
             data.reverse();
         }
 
         const timeTaken = (endTime - startTime).toFixed(2);
-
-        // Determine the next cursor
-        const nextCursor = data.length > 0 ? data[data.length - 1]._id.toString() : null;
-
-        res.json({
+        
+        // Always return both the first and last ID for proper cursor tracking
+        const responseData = {
             method: 'with-cursor',
             data,
             limit,
-            nextCursor,
+            nextCursor: data.length > 0 ? data[data.length - 1]._id.toString() : null,
             timeTaken
-        });
+        };
+
+        res.json(responseData);
     } catch (err) {
         console.error('Error in /with-cursor route:', err);
         res.status(500).json({ error: 'Internal Server Error' });
