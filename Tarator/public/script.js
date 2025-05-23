@@ -1,7 +1,7 @@
 console.log('Script is running');
 
 let currentPage = 1;
-const limit = 1000; // Increased to 1000 records per page
+let limit = 1000; // Default value
 
 // Lists to store data for both methods
 const noCursorData = [];
@@ -126,7 +126,19 @@ function updateChartWithLists() {
     avgWithCursorTimeDisplay.textContent = `Average Time (With Cursor): ${avgWithCursorTime.toFixed(2)} ms`;
 }
 
-// Update event listeners for pagination
+function resetData() {
+    noCursorData.length = 0;
+    withCursorData.length = 0;
+    forwardCursor = null;
+    backwardCursor = null;
+    currentPage = 1;
+    performanceChart.data.labels = [];
+    performanceChart.data.datasets[0].data = [];
+    performanceChart.data.datasets[1].data = [];
+    performanceChart.update();
+}
+
+// Update event listeners for pagination and limit
 document.getElementById('next-page').addEventListener('click', () => {
     currentPage++;
     fetchDataForBothSections(currentPage, 'forward');
@@ -139,7 +151,20 @@ document.getElementById('prev-page').addEventListener('click', () => {
     }
 });
 
+document.getElementById('updateLimit').addEventListener('click', () => {
+    const newLimit = parseInt(document.getElementById('recordsLimit').value);
+    if (newLimit >= 100 && newLimit <= 100000) {
+        limit = newLimit;
+        resetData();
+        recordsPerPageDisplay.textContent = `Records per page: ${limit}`;
+        fetchDataForBothSections(currentPage);
+    } else {
+        alert('Please enter a value between 100 and 100000');
+    }
+});
+
 // Initialize data fetching
 window.addEventListener('load', () => {
+    document.getElementById('recordsLimit').value = limit;
     fetchDataForBothSections(currentPage);
 });
