@@ -6,26 +6,23 @@ const client = new MongoClient(uri);
 const dbName = 'demoDB';
 
 async function seedDatabase() {
-  try {
-    await client.connect();
-    console.log('Connected to MongoDB');
+    try {
+        await client.connect();
+        console.log('Connected to MongoDB');
 
-    const db = client.db(dbName);
-    const collection = db.collection('usersPolly');
+        const db = client.db(dbName);
+        const collection = db.collection('usersPolly');
 
-    // Изчистване на съществуващите данни
-    await collection.deleteMany({});
+        await collection.deleteMany({});
+        const data = JSON.parse(fs.readFileSync('mockData.json', 'utf8'));
+        await collection.insertMany(data);
 
-    // Зареждане на примерни данни
-    const data = JSON.parse(fs.readFileSync('mockData.json', 'utf8'));
-    await collection.insertMany(data);
-
-    console.log('Базата данни е успешно заредена');
-  } catch (err) {
-    console.error('Грешка при зареждане на базата данни:', err);
-  } finally {
-    await client.close();
-  }
+        console.log('Базата данни е успешно заредена');
+    } catch (err) {
+        console.error('Грешка при зареждане на базата данни:', err);
+    } finally {
+        await client.close();
+    }
 }
 
 seedDatabase();
