@@ -14,7 +14,7 @@ app.use(express.json());
 const uri = process.env.DB_CONN_STRING;   // Взима връзката от .env
 const dbName = process.env.DB_NAME || 'testdb'; // Взима името на базата
 
-const client = new MongoClient('mongodb://localhost:27017/');
+const client = new MongoClient(uri);
 
 async function main() {
   await client.connect();

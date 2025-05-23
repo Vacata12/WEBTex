@@ -12,8 +12,9 @@ async function cursorPaginationDemo() {
         const db = client.db(dbName);
         const collection = db.collection('users');
 
+        // Cursor-based pagination
         const pageSize = 10;
-        let lastCursor = null;
+        let lastCursor = null; // Replace with the last cursor from the previous page if available
 
         const query = lastCursor ? { _id: { $gt: lastCursor } } : {};
         const options = { sort: { _id: 1 }, limit: pageSize };
@@ -40,8 +41,9 @@ async function offsetPaginationDemo() {
         const db = client.db(dbName);
         const collection = db.collection('users');
 
+        // Offset-based pagination
         const pageSize = 10;
-        const pageNumber = 1;
+        const pageNumber = 1; // Replace with the desired page number
 
         const items = await collection.find({})
             .sort({ _id: 1 })
