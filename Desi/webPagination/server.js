@@ -2,6 +2,11 @@ import express from 'express';
 import { MongoClient } from 'mongodb';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();  // Зарежда .env файла
 
@@ -10,6 +15,12 @@ const port = 3000;
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static(__dirname));
+
+// Serve index.html at the root route
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 const uri = process.env.DB_CONN_STRING;   // Взима връзката от .env
 const dbName = process.env.DB_NAME || 'testdb'; // Взима името на базата
