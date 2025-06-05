@@ -1,273 +1,96 @@
-// Интерфейс за файл или папка
-interface FileNode {
+// ...file search logic for MongoDB-like file objects...
+
+export interface FileNode {
+  _id: string;
   name: string;
+  type: 'file' | 'directory';
   path: string;
-  isDirectory: boolean;
-  children?: FileNode[];
+  owner: string;
+  isPublic: boolean;
+  mimeType?: string;
+  size?: number;
+  lastModified: string;
+  originalName: string;
+  parent?: string;
 }
 
-// Интерфейс за резултат от търсене
-interface SearchResult {
-  path: string;
+export interface SearchResult {
+  _id: string;
   name: string;
-  isDirectory: boolean;
+  type: 'file' | 'directory';
+  path: string;
+  owner: string;
+  size?: number;
+  mimeType?: string;
+  lastModified: string;
+  originalName: string;
 }
 
-// Клас за извършване на търсене във файлова структура
-class FileSearch {
-  private rootDir: FileNode;
-  private searchResults: SearchResult[] = [];
-  private onResultsUpdate: (results: SearchResult[]) => void;
+// Example mock data matching your MongoDB schema
+export const mockFiles: FileNode[] = [
+  {
+    _id: '1',
+    name: 'nodemon.json',
+    type: 'file',
+    path: '/nodemon.json',
+    owner: 'user1',
+    isPublic: false,
+    mimeType: 'application/json',
+    size: 123,
+    lastModified: new Date().toISOString(),
+    originalName: 'nodemon.json',
+  },
+  {
+    _id: '2',
+    name: 'package.json',
+    type: 'file',
+    path: '/package.json',
+    owner: 'user1',
+    isPublic: false,
+    mimeType: 'application/json',
+    size: 456,
+    lastModified: new Date().toISOString(),
+    originalName: 'package.json',
+  },
+  {
+    _id: '3',
+    name: 'public',
+    type: 'directory',
+    path: '/public',
+    owner: 'user1',
+    isPublic: false,
+    lastModified: new Date().toISOString(),
+    originalName: 'public',
+  },
+  {
+    _id: '4',
+    name: 'index.ts',
+    type: 'file',
+    path: '/public/index.ts',
+    owner: 'user1',
+    isPublic: false,
+    mimeType: 'text/typescript',
+    size: 789,
+    lastModified: new Date().toISOString(),
+    originalName: 'index.ts',
+    parent: '3',
+  },
+  {
+    _id: '5',
+    name: 'README.md',
+    type: 'file',
+    path: '/README.md',
+    owner: 'user1',
+    isPublic: true,
+    mimeType: 'text/markdown',
+    size: 100,
+    lastModified: new Date().toISOString(),
+    originalName: 'README.md',
+  },
+];
 
-  constructor(
-    rootDir: FileNode,
-    onResultsUpdate: (results: SearchResult[]) => void
-  ) {
-    this.rootDir = rootDir;
-    this.onResultsUpdate = onResultsUpdate;
-  }
-
-  // Основен метод за търсене по шаблон в структурата
-  public search(pattern: string, currentDir: FileNode | null = null): void {
-    this.searchResults = [];
-
-    const trimmedPattern = pattern.trim();
-    if (!trimmedPattern) {
-      this.onResultsUpdate(this.searchResults);
-      return;
-    }
-
-    const searchTerm = trimmedPattern.toLowerCase();
-    const folderToSearch = currentDir || this.rootDir;
-
-    this.searchNode(folderToSearch, searchTerm);
-    this.onResultsUpdate(this.searchResults);
-  }
-
-  // Рекурсивно претърсване на папки и файлове
-  private searchNode(node: FileNode, searchTerm: string): void {
-    const nodeNameLower = node.name.toLowerCase();
-    const matchesName = nodeNameLower.includes(searchTerm);
-
-    if (matchesName) {
-      this.searchResults.push({
-        path: node.path,
-        name: node.name,
-        isDirectory: node.isDirectory
-      });
-    }
-
-    node.children?.forEach(child => this.searchNode(child, searchTerm));
-  }
+export function searchFiles(files: FileNode[], pattern: string): SearchResult[] {
+  const searchTerm = pattern.trim().toLowerCase();
+  if (!searchTerm) return [];
+  return files.filter(file => file.name.toLowerCase().includes(searchTerm));
 }
-
-// Примерна файлова система (макет)
-const mockFileSystem: FileNode = {
-  name: 'root',
-  path: '/',
-  isDirectory: true,
-  children: [
-    { name: 'nodemon.json', path: '/nodemon.json', isDirectory: false },
-    { name: 'package.json', path: '/package.json', isDirectory: false },
-    {
-      name: 'public',
-      path: '/public',
-      isDirectory: true,
-      children: [
-        { name: 'index.ts', path: '/public/index.ts', isDirectory: false }
-      ]
-    },
-    { name: 'README.md', path: '/README.md', isDirectory: false },
-    {
-      name: 'src',
-      path: '/src',
-      isDirectory: true,
-      children: [
-        { name: 'app.ts', path: '/src/app.ts', isDirectory: false },
-        {
-          name: 'config',
-          path: '/src/config',
-          isDirectory: true,
-          children: [
-            { name: 'db.ts', path: '/src/config/db.ts', isDirectory: false }
-          ]
-        },
-        {
-          name: 'controllers',
-          path: '/src/controllers',
-          isDirectory: true,
-          children: [
-            { name: 'fileController.ts', path: '/src/controllers/fileController.ts', isDirectory: false }
-          ]
-        },
-        {
-          name: 'db',
-          path: '/src/db',
-          isDirectory: true,
-          children: [
-            { name: 'connection.ts', path: '/src/db/connection.ts', isDirectory: false },
-            { name: 'dbInit.ts', path: '/src/db/dbInit.ts', isDirectory: false }
-          ]
-        },
-        {
-          name: 'middlewares',
-          path: '/src/middlewares',
-          isDirectory: true,
-          children: [
-            { name: 'errorHandler.ts', path: '/src/middlewares/errorHandler.ts', isDirectory: false }
-          ]
-        },
-        {
-          name: 'models',
-          path: '/src/models',
-          isDirectory: true,
-          children: [
-            { name: 'fileModel.ts', path: '/src/models/fileModel.ts', isDirectory: false },
-            { name: 'storageQuotaModel.ts', path: '/src/models/storageQuotaModel.ts', isDirectory: false },
-            { name: 'userModel.ts', path: '/src/models/userModel.ts', isDirectory: false }
-          ]
-        },
-        {
-          name: 'routes',
-          path: '/src/routes',
-          isDirectory: true,
-          children: [
-            { name: 'fileRoutes.ts', path: '/src/routes/fileRoutes.ts', isDirectory: false }
-          ]
-        },
-        { name: 'server.ts', path: '/src/server.ts', isDirectory: false },
-        {
-          name: 'utils',
-          path: '/src/utils',
-          isDirectory: true,
-          children: [
-            { name: 'logger.ts', path: '/src/utils/logger.ts', isDirectory: false }
-          ]
-        }
-      ]
-    },
-    { name: 'tsconfig.json', path: '/tsconfig.json', isDirectory: false }
-  ]
-};
-
-// Клас, който управлява потребителския интерфейс на търсачката
-class SearchUI {
-  private fileSearch: FileSearch;
-  private searchInput: HTMLInputElement;
-  private resultsContainer: HTMLElement;
-  private noResultsText: string;
-  private debounceTimeoutId: number | undefined;
-
-  constructor(
-    rootDir: FileNode,
-    searchInputId: string,
-    resultsContainerId: string,
-    noResultsText = 'No results found'
-  ) {
-    this.searchInput = document.getElementById(searchInputId) as HTMLInputElement;
-    this.resultsContainer = document.getElementById(resultsContainerId) as HTMLElement;
-    this.noResultsText = noResultsText;
-
-    this.fileSearch = new FileSearch(rootDir, this.updateResults.bind(this));
-
-    this.searchInput.addEventListener('input', this.debounceInput.bind(this));
-  }
-
-  // Забавя изпълнението при писане, за да не се търси веднага при всяка буква
-  private debounceInput(): void {
-    if (this.debounceTimeoutId) {
-      clearTimeout(this.debounceTimeoutId);
-    }
-    this.debounceTimeoutId = window.setTimeout(() => {
-      this.fileSearch.search(this.searchInput.value);
-    }, 200);
-  }
-
-  // Обновява резултатите от търсенето в потребителския интерфейс
-  private updateResults(results: SearchResult[]): void {
-    this.resultsContainer.innerHTML = '';
-
-    if (results.length === 0) {
-      const noResults = document.createElement('div');
-      noResults.textContent = this.noResultsText;
-      noResults.className = 'dropdown-item';
-      this.resultsContainer.appendChild(noResults);
-      return;
-    }
-
-    const directories = results.filter(result => result.isDirectory);
-    const files = results.filter(result => !result.isDirectory);
-
-    if (directories.length > 0) {
-      const dirHeader = document.createElement('div');
-      dirHeader.className = 'dropdown-item header';
-      dirHeader.textContent = 'Directories:';
-      dirHeader.style.fontWeight = 'bold';
-      this.resultsContainer.appendChild(dirHeader);
-
-      directories.forEach(result => {
-        const item = document.createElement('div');
-        item.className = 'dropdown-item';
-        item.style.display = 'flex';
-        item.style.justifyContent = 'space-between';
-        item.style.alignItems = 'center';
-
-        const namePath = document.createElement('span');
-        namePath.textContent = `${result.name} (${result.path})`;
-
-        const typeLabel = document.createElement('span');
-        typeLabel.textContent = 'directory';
-        typeLabel.style.color = '#007bff';
-        typeLabel.style.fontStyle = 'italic';
-
-        const depth = result.path.split('/').length - 2;
-        item.style.marginLeft = `${depth * 10}px`;
-        item.appendChild(namePath);
-        item.appendChild(typeLabel);
-        this.resultsContainer.appendChild(item);
-      });
-    }
-
-    if (files.length > 0) {
-      const fileHeader = document.createElement('div');
-      fileHeader.className = 'dropdown-item header';
-      fileHeader.textContent = 'Files:';
-      fileHeader.style.fontWeight = 'bold';
-      this.resultsContainer.appendChild(fileHeader);
-
-      files.forEach(result => {
-        const item = document.createElement('div');
-        item.className = 'dropdown-item';
-        item.style.display = 'flex';
-        item.style.justifyContent = 'space-between';
-        item.style.alignItems = 'center';
-
-        const namePath = document.createElement('span');
-        namePath.textContent = `${result.name} (${result.path})`;
-
-        const typeLabel = document.createElement('span');
-        typeLabel.textContent = 'file';
-        typeLabel.style.color = '#28a745';
-        typeLabel.style.fontStyle = 'italic';
-
-        const depth = result.path.split('/').length - 2;
-        item.style.marginLeft = `${depth * 10}px`;
-        item.appendChild(namePath);
-        item.appendChild(typeLabel);
-        this.resultsContainer.appendChild(item);
-      });
-    }
-  }
-}
-
-// Стартиране на търсачката и свързване с интерфейса
-function initializeSearch(): void {
-  new SearchUI(
-    mockFileSystem,
-    'search-input',
-    'search-results'
-  );
-}
-
-// Експорт на класовете и функцията, за да могат да се използват в други файлове
-export { FileSearch, SearchUI, initializeSearch, FileNode, SearchResult };
