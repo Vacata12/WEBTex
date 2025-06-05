@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-interface IFile extends Document {
+export interface IFile extends Document {
     name: string;
     type: string;
     path: string;
@@ -80,7 +80,6 @@ const FileSchema: Schema = new Schema({
 }, {
     timestamps: true
 });
-
 
 FileSchema.index({ owner: 1, path: 1 }, { unique: true });
 FileSchema.index({ parent: 1 });
