@@ -92,5 +92,13 @@ export const mockFiles: FileNode[] = [
 export function searchFiles(files: FileNode[], pattern: string): SearchResult[] {
   const searchTerm = pattern.trim().toLowerCase();
   if (!searchTerm) return [];
+
+  // Check if the search term contains a '/'
+  if (searchTerm.includes('/')) {
+    // Filter by full path
+    return files.filter(file => file.path.toLowerCase().includes(searchTerm));
+  }
+
+  // Default: Filter by file name
   return files.filter(file => file.name.toLowerCase().includes(searchTerm));
 }
