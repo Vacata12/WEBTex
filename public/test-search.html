@@ -36,6 +36,7 @@
     }
     .dropdown-item:hover {
       background-color: #cd1818;
+      color: white;
     }
   </style>
 </head>
@@ -45,21 +46,33 @@
   <div id="search-results"></div>
 
   <script type="module">
-    import { initializeSearch } from '../src/utils/fileSearch.ts';
-    
-    // Initialize search when DOM is loaded
+    import { searchFiles, mockFiles } from '../src/utils/fileSearch.ts';
+
     document.addEventListener('DOMContentLoaded', () => {
-      initializeSearch();
-      
-      // Show/hide results based on input
       const searchInput = document.getElementById('search-input');
       const resultsContainer = document.getElementById('search-results');
-      
+
+      // Function to render search results
+      const renderResults = (results) => {
+        resultsContainer.innerHTML = ''; // Clear previous results
+        results.forEach(file => {
+          const item = document.createElement('div');
+          item.className = 'dropdown-item';
+          item.textContent = `${file.name} (${file.type})`;
+          resultsContainer.appendChild(item);
+        });
+      };
+
+      // Event listener for input changes
       searchInput.addEventListener('input', () => {
-        if (searchInput.value.trim()) {
+        const searchTerm = searchInput.value.trim();
+        if (searchTerm) {
+          const results = searchFiles(mockFiles, searchTerm);
+          renderResults(results);
           resultsContainer.classList.add('active');
         } else {
           resultsContainer.classList.remove('active');
+          resultsContainer.innerHTML = ''; // Clear results
         }
       });
     });
