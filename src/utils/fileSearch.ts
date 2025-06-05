@@ -66,7 +66,7 @@ export const mockFiles: FileNode[] = [
     _id: '4',
     name: 'index.ts',
     type: 'file',
-    path: '/public/index.ts',
+    path: '/public/index bimbim.ts',
     owner: 'user1',
     isPublic: false,
     mimeType: 'text/typescript',

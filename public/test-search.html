@@ -51,6 +51,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       const searchInput = document.getElementById('search-input');
       const resultsContainer = document.getElementById('search-results');
+      let debounceTimeout;
   
       // Function to render search results with additional details
       const renderResults = (results) => {
@@ -68,17 +69,24 @@
         });
       };
   
-      // Event listener for input changes
+      // Event listener for input changes with debounce
       searchInput.addEventListener('input', () => {
         const searchTerm = searchInput.value.trim();
-        if (searchTerm) {
-          const results = searchFiles(mockFiles, searchTerm);
-          renderResults(results);
-          resultsContainer.classList.add('active');
-        } else {
-          resultsContainer.classList.remove('active');
-          resultsContainer.innerHTML = ''; // Clear results
-        }
+  
+        // Clear the previous timeout
+        clearTimeout(debounceTimeout);
+  
+        // Set a new timeout to delay the search
+        debounceTimeout = setTimeout(() => {
+          if (searchTerm) {
+            const results = searchFiles(mockFiles, searchTerm);
+            renderResults(results);
+            resultsContainer.classList.add('active');
+          } else {
+            resultsContainer.classList.remove('active');
+            resultsContainer.innerHTML = ''; // Clear results
+          }
+        }, 300); // Delay of 300ms
       });
     });
   </script>
