@@ -47,22 +47,27 @@
 
   <script type="module">
     import { searchFiles, mockFiles } from '../src/utils/fileSearch.ts';
-
+  
     document.addEventListener('DOMContentLoaded', () => {
       const searchInput = document.getElementById('search-input');
       const resultsContainer = document.getElementById('search-results');
-
-      // Function to render search results
+  
+      // Function to render search results with additional details
       const renderResults = (results) => {
         resultsContainer.innerHTML = ''; // Clear previous results
         results.forEach(file => {
           const item = document.createElement('div');
           item.className = 'dropdown-item';
-          item.textContent = `${file.name} (${file.type})`;
+          item.innerHTML = `
+            <strong>${file.name}</strong> (${file.type})<br>
+            <small>Path: ${file.path}</small><br>
+            <small>Size: ${file.size || 'N/A'} bytes</small><br>
+            <small>Last Modified: ${new Date(file.lastModified).toLocaleString()}</small>
+          `;
           resultsContainer.appendChild(item);
         });
       };
-
+  
       // Event listener for input changes
       searchInput.addEventListener('input', () => {
         const searchTerm = searchInput.value.trim();

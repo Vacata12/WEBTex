@@ -26,7 +26,7 @@ export interface SearchResult {
   originalName: string;
 }
 
-// Example mock data matching your MongoDB schema
+// Example mock data matching MongoDB schema
 export const mockFiles: FileNode[] = [
   {
     _id: '1',
