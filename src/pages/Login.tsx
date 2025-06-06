@@ -3,19 +3,19 @@ import { useNavigate } from 'react-router-dom';
 import { login } from '../api/auth';
 
 export default function Login() {
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const res = await login(email, password);
+        const res = await login(username, password);
         if (res.ok) {
             navigate('/dashboard');
         } else {
             const data = await res.json();
-            setError(data.message || 'Invalid email or password');
+            setError(data.message || 'Invalid username or password');
         }
     };
 
@@ -24,10 +24,10 @@ export default function Login() {
             <h2>Login</h2>
 
             <input
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="Email"
+                type="text"
+                value={username}
+                onChange={e => setUsername(e.target.value)}
+                placeholder="Username"
                 required
             />
             <input
@@ -46,4 +46,3 @@ export default function Login() {
         </form>
     );
 }
-

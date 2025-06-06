@@ -2,32 +2,47 @@
   "name": "webtex",
   "version": "1.0.0",
   "description": "WEBTex Cloud Drive",
+  "type": "commonjs",
   "main": "dist/server.js",
   "scripts": {
     "build": "tsc --skipLibCheck",
-    "start": "node dist/server.js",
-    "dev": "nodemon",
+    "start:server": "tsc && node dist/server.js",
+    "start:client": "vite",
+    "dev": "concurrently \"tsc --watch\" \"nodemon dist/server.js\" \"npm run start:client\"",
     "init-db": "ts-node --transpile-only src/db/dbInit.ts",
-    "clean": "rm -rf node_modules && rm -f package-lock.json && npm cache clean --force",
+    "clean": "rm -rf node_modules dist && rm -f package-lock.json && npm cache clean --force",
     "reinstall": "npm run clean && npm install"
   },
   "dependencies": {
-    "@types/multer": "^1.4.12",
     "bcrypt": "^5.1.1",
-    "dotenv": "^16.3.1",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
     "express": "^4.18.2",
+    "express-session": "^1.18.1",
     "mongoose": "^7.5.3",
     "multer": "^1.4.5-lts.2",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "react-router-dom": "^7.6.2"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
-    "@types/express": "^4.17.18",
-    "@types/node": "^18.18.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.18",
+    "@types/express": "^4.17.22",
+    "@types/express-session": "^1.18.1",
+    "@types/multer": "^1.4.12",
+    "@types/node": "^18.19.11",
+    "@types/react": "^19.1.6",
+    "@types/react-dom": "^19.1.6",
+    "@types/react-router-dom": "^5.3.3",
+    "@vitejs/plugin-react": "^4.5.1",
+    "concurrently": "^8.2.2",
     "nodemon": "^3.0.1",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.0.4"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.0.4",
+    "vite": "^5.4.19"
   },
   "engines": {
     "node": ">=16.0.0"
