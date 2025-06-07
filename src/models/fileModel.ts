@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-interface IFile extends Document {
+export interface IFile extends Document {
     name: string;
     type: string;
     path: string;
