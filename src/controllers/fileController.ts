@@ -4,6 +4,19 @@ import mongoose from "mongoose";
 import IFile from "../models/fileModel.js";
 import { fileTypeFromBlob, fileTypeFromBuffer } from "file-type";
 
+// Extend Express Request interface to include 'user'
+declare global {
+    namespace Express {
+        interface User {
+            _id: mongoose.Types.ObjectId | string;
+            // add other user properties if needed
+        }
+        interface Request {
+            user?: User;
+        }
+    }
+}
+
 interface MulterRequest extends Request {
     file?: Express.Multer.File;
 }
@@ -14,19 +27,52 @@ export const uploadFile = async (req: Request, res: Response): Promise<void> => 
     try {
         if(!req.file) {
             res.status(400).send("No file uploaded");
+            return;
+        }
+
+        const userId = req.user?._id;
+        
+        if (!userId) {
+            res.status(401).send("User not authenticated");
+            return;
         }
 
         const { originalname, mimetype, size, buffer } = req.file as Express.Multer.File;
 
+        // Generate a unique path by including the filename
+        const uniquePath = `/${req.body.parent || 'root'}/${originalname}`;
+
+        // Check if file already exists in this path
+        const existingFile = await fileModel.findOne({
+            owner: new mongoose.Types.ObjectId(userId),
+            path: uniquePath,
+            name: originalname
+        });
+
+        if (existingFile) {
+            // Update existing file instead of creating new one
+            existingFile.content = buffer.toString('base64');
+            existingFile.size = size;
+            existingFile.mimeType = mimetype;
+            existingFile.lastModified = new Date();
+            
+            await existingFile.save();
+            res.status(200).send({ 
+                message: "File updated successfully", 
+                file: existingFile 
+            });
+            return;
+        }
+
         const newFile = new fileModel({
-            name: req.body.name || originalname,
+            name: originalname,
             type: "file",
-            path: '/',
+            path: uniquePath,
             content: buffer.toString('base64'),
             mimeType: mimetype,
             size: size,
-            owner: new mongoose.Types.ObjectId("645b9c8f4f509b0012345678"),
-            parent: new mongoose.Types.ObjectId("645b9c8f4f509b0012345678"),
+            owner: new mongoose.Types.ObjectId(userId),
+            parent: req.body.parent || null,
             isPublic: false,
             lastModified: new Date(),
             originalName: originalname,
@@ -35,9 +81,13 @@ export const uploadFile = async (req: Request, res: Response): Promise<void> => 
         });
 
         await newFile.save();
-        res.status(201).send({ message: "File uploaded successfully", file: newFile });
+        res.status(201).send({ 
+            message: "File uploaded successfully", 
+            file: newFile 
+        });
     }
     catch(error) {
+        console.error('Upload error:', error);
         res.status(500).send("Error uploading file: " + error);
     }
 }
@@ -77,16 +127,31 @@ export const downloadFile = async (req: Request, res: Response): Promise<void> =
 export const deleteFile = async(req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
-        const deleteFile = await fileModel.findByIdAndRemove(id);
+        const userId = req.user?._id;
 
-        if (!deleteFile) {
-            res.status(404).send("File not found!");
+        if (!userId) {
+            res.status(401).send("User not authenticated");
             return;
         }
 
-        res.status(200).send({ message: "File deleted successfully", file: deleteFile });
+        const file = await fileModel.findOne({
+            _id: id,
+            owner: userId
+        });
+
+        if (!file) {
+            res.status(404).send("File not found or you don't have permission to delete it");
+            return;
+        }
+
+        await fileModel.findByIdAndDelete(id);
+        res.status(200).json({ 
+            message: "File deleted successfully", 
+            fileId: id 
+        });
     }
     catch(error) {
+        console.error('Delete error:', error);
         res.status(500).send("Error deleting file: " + error);  
     }
 }
@@ -94,25 +159,58 @@ export const deleteFile = async(req: Request, res: Response): Promise<void> => {
 //upload directory in work
 export const createDirectory = async(req: Request, res: Response): Promise<void> => {
     try {
-        const { originalname, mimetype, size, buffer } = req.file as Express.Multer.File;
+        const userId = req.user?._id;
+        
+        if (!userId) {
+            res.status(401).send("User not authenticated");
+            return;
+        }
 
-        const newFile = new fileModel({
-            name: req.body.name || originalname,
+        const { name, parent } = req.body;
+
+        if (!name) {
+            res.status(400).send("Directory name is required");
+            return;
+        }
+
+        // Generate a unique path
+        const uniquePath = `/${parent || 'root'}/${name}`;
+
+        // Check if directory already exists
+        const existingDir = await fileModel.findOne({
+            owner: new mongoose.Types.ObjectId(userId),
+            path: uniquePath,
+            name: name,
+            type: 'directory'
+        });
+
+        if (existingDir) {
+            res.status(409).send("Directory already exists");
+            return;
+        }
+
+        const newDirectory = new fileModel({
+            name: name,
             type: "directory",
-            path: '/',
-            content: buffer.toString('base64'),
-            mimeType: mimetype,
-            size: size,
-            owner: new mongoose.Types.ObjectId("645b9c8f4f509b0012345678"),
-            parent: new mongoose.Types.ObjectId("645b9c8f4f509b0012345678"),
+            path: uniquePath,
+            size: 0,
+            owner: new mongoose.Types.ObjectId(userId),
+            parent: parent || null,
             isPublic: false,
             lastModified: new Date(),
-            originalName: originalname,
-            sharedWith: req.body.sharedWith || [],
-            starred: req.body.starred || false
+            originalName: name,
+            sharedWith: [],
+            starred: false
+        });
+
+        await newDirectory.save();
+        res.status(201).json({ 
+            message: "Directory created successfully", 
+            directory: newDirectory 
         });
     }
     catch (error) {
+        console.error('Create directory error:', error);
         res.status(500).send("Error creating directory: " + error);  
     }
 }
@@ -120,20 +218,26 @@ export const createDirectory = async(req: Request, res: Response): Promise<void>
 export const showDataInDirectory = async(req: Request, res: Response): Promise<void> => {
     try {
         const { directoryId } = req.params;
-        const userId = new mongoose.Types.ObjectId("645b9c8f4f509b0012345678");
+        // Get user ID from session
+        const userId = req.session?.user?.id;
+        
+        if (!userId) {
+            res.status(401).send("User not authenticated");
+            return;
+        }
 
         const query = directoryId ? {
             parent: new mongoose.Types.ObjectId(directoryId),
             $or: [
-                {owner: userId},
-                {shareWith: userId},
+                {owner: new mongoose.Types.ObjectId(userId)},
+                {sharedWith: new mongoose.Types.ObjectId(userId)},
                 {isPublic: true}
             ]
         } : {
             parent: null,
             $or: [
-                {owner: userId},
-                {shareWith: userId},
+                {owner: new mongoose.Types.ObjectId(userId)},
+                {sharedWith: new mongoose.Types.ObjectId(userId)},
                 {isPublic: true}
             ]
         };
@@ -143,18 +247,14 @@ export const showDataInDirectory = async(req: Request, res: Response): Promise<v
             .select("name type size lastModified isPublic starred originalName")
             .sort({type: -1, name: 1});
         
-        if (!files || files.length == 0) {
-            res.status(200).json({message: "Direcory is empty", files: []});
-            return;
-        }
-
         res.status(200).json({
-            message: "Files retrieved successfully",
-            currentDirecory: directoryId || "root",
-            files: files
+            message: files.length ? "Files retrieved successfully" : "Directory is empty",
+            currentDirectory: directoryId || "root",
+            items: files
         });
     }
     catch (error) {
+        console.error('Directory error:', error);
         res.status(500).send("Error retrieving directory contents: " + error);
     }
 }
@@ -236,3 +336,39 @@ export const previewFile = async(req: Request, res:Response): Promise<void> => {
         res.status(500).send("Error retrieving file content: " + error);
     }
 }
+
+export const getDirectoryPath = async(req: Request, res: Response): Promise<void> => {
+    try {
+        const { directoryId } = req.params;
+        const userId = req.user?._id;
+        
+        if (!userId || !directoryId) {
+            res.status(401).send("User not authenticated or invalid directory");
+            return;
+        }
+
+        let currentDir = await fileModel.findOne({
+            _id: directoryId,
+            owner: userId
+        });
+        
+        const path: Array<{ _id: any; name: string }> = [];
+        
+        while (currentDir && currentDir.parent) {
+            path.unshift({
+                _id: currentDir._id,
+                name: currentDir.name
+            });
+            
+            currentDir = await fileModel.findOne({
+                _id: currentDir.parent,
+                owner: userId
+            });
+        }
+        
+        res.status(200).json(path);
+    } catch (error) {
+        console.error('Path error:', error);
+        res.status(500).send("Error retrieving directory path: " + error);
+    }
+};

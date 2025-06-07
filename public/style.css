@@ -16,10 +16,13 @@ body {
 }
 
 header {
-    background: var(--primary-color);
-    color: var(--text-light);
+    background: #2c3e50;
+    color: #ffffff;
     padding: 1rem 0;
-    box-shadow: var(--shadow);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
 header h1 {
@@ -50,6 +53,27 @@ nav a:hover {
     background: var(--secondary-color);
     transform: translateY(-2px);
     box-shadow: var(--shadow);
+}
+
+.nav-link {
+    color: #ffffff;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nav-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.nav-link i {
+    font-size: 1.1rem;
 }
 
 .page {
@@ -126,4 +150,177 @@ label {
     color: #666;
     line-height: 1.6;
     margin-bottom: 1.5rem;
+}
+
+/* Add these styles to your existing CSS */
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 5px;
+    width: 80%;
+    max-width: 500px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.action-buttons {
+    margin: 20px 0;
+    display: flex;
+    gap: 10px;
+}
+
+.files-container {
+    margin-top: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 20px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+/* Header and Navigation */
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-content h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+#guest-nav, #user-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.user-greeting i {
+    color: #3498db;
+}
+
+/* File Container */
+.files-container {
+    margin: 2rem auto;
+    max-width: 1200px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Action Buttons */
+.action-buttons {
+    margin: 2rem auto;
+    max-width: 1200px;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.btn-primary {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.1rem;
+}
+
+#username-display {
+    color: #3498db;
+    font-weight: 600;
+}
+
+/* Logout button specific styling */
+.nav-link[onclick*="handleLogout"] {
+    background: #e74c3c;
+    color: white;
+    padding: 0.5rem 1.2rem;
+}
+
+.nav-link[onclick*="handleLogout"]:hover {
+    background: #c0392b;
+    transform: translateY(-2px);
+}
+
+/* Add these styles */
+.breadcrumb {
+    padding: 10px;
+    margin-bottom: 20px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.breadcrumb-item {
+    color: var(--secondary-color);
+    cursor: pointer;
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
+.breadcrumb-item:hover {
+    background: #e9ecef;
+}
+
+.breadcrumb-separator {
+    color: #6c757d;
+    margin: 0 5px;
 }

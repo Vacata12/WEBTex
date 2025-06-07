@@ -1,6 +1,6 @@
 import express from "express";
 import bcrypt from "bcryptjs";
-import User from "../models/userModel"; // моделът от MongoDB
+import User from "../models/userModel.js"; // моделът от MongoDB
 
 // Add this import if you use express-session
 import session from "express-session";
@@ -60,25 +60,38 @@ router.post("/register", async (req, res) => {
 
 // 📌 POST /api/auth/login
 router.post("/login", async (req, res) => {
-  const { username, password } = req.body;
+    const { username, password } = req.body;
 
-  if (!username || !password) {
-    return res.status(400).json({ message: "Missing username or password" });
-  }
+    if (!username || !password) {
+        return res.status(400).json({ message: "Missing username or password" });
+    }
 
-  const user = await User.findOne({ username });
-  if (!user || !(await bcrypt.compare(password, user.password))) {
-    return res.status(401).json({ message: "Invalid credentials" });
-  }
+    try {
+        const user = await User.findOne({ username });
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+            return res.status(401).json({ message: "Invalid credentials" });
+        }
 
-  // Записваме в сесията
-  req.session.user = {
-    id: user._id.toString(),
-    username: user.username,
-    email: user.email,
-  };
+        // Update session
+        req.session.user = {
+            id: user._id.toString(),
+            username: user.username,
+            email: user.email
+        };
 
-  res.status(200).json({ message: "Login successful" });
+        // Send response that matches frontend expectations
+        res.status(200).json({
+            success: true,
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email
+            }
+        });
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        res.status(500).json({ message: "Login failed", error: errorMessage });
+    }
 });
 
 // 📌 GET /api/auth/me
