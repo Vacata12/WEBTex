@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Web Application</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1><i class="fas fa-code"></i> Modern Web Application</h1>
+            <nav>
+                <a href="#" onclick="window.showPage('home')" class="nav-link">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a href="#" onclick="window.showPage('about')" class="nav-link">
+                    <i class="fas fa-info-circle"></i> About
+                </a>
+                <a href="#" onclick="window.showPage('login')" class="nav-link">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+                <a href="#" onclick="window.showPage('register')" class="nav-link">
+                    <i class="fas fa-user-plus"></i> Register
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div id="home" class="page" style="display: block;">
+            <div class="page-content">
+                <h2><i class="fas fa-rocket"></i> Welcome to the Future</h2>
+                <p class="feature-text">Experience the next generation of web applications.</p>
+                <div class="features">
+                    <div class="feature-card">
+                        <i class="fas fa-bolt"></i>
+                        <h3>Lightning Fast</h3>
+                        <p>Optimized for speed and performance</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-shield-alt"></i>
+                        <h3>Secure</h3>
+                        <p>Built with security in mind</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-mobile-alt"></i>
+                        <h3>Responsive</h3>
+                        <p>Works on all devices</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="about" class="page" style="display: none;">
+            <div class="page-content">
+                <h2><i class="fas fa-users"></i> About Us</h2>
+                <div class="about-content">
+                    <div class="about-text">
+                        <p>We are a team of passionate developers creating the next generation of web applications.</p>
+                        <p>Our mission is to make the web more beautiful, one site at a time.</p>
+                    </div>
+                    <div class="team-stats">
+                        <div class="stat-card">
+                            <i class="fas fa-project-diagram"></i>
+                            <h4>100+</h4>
+                            <p>Projects Completed</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-smile-beam"></i>
+                            <h4>500+</h4>
+                            <p>Happy Clients</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="login" class="page" style="display: none;">
+            <div class="page-content">
+                <h2><i class="fas fa-sign-in-alt"></i> Login</h2>
+                <form class="auth-form">
+                    <div class="form-group">
+                        <label for="username">
+                            <i class="fas fa-user"></i> Username
+                        </label>
+                        <input type="text" id="username" name="username" placeholder="Enter your username">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">
+                            <i class="fas fa-lock"></i> Password
+                        </label>
+                        <input type="password" id="password" name="password" autocomplete="current-password" placeholder="Enter your password">
+                    </div>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div id="register" class="page" style="display: none;">
+            <div class="page-content">
+                <h2><i class="fas fa-user-plus"></i> Register</h2>
+                <form class="auth-form">
+                    <div class="form-group">
+                        <label for="newUsername">
+                            <i class="fas fa-user"></i> Username
+                        </label>
+                        <input type="text" id="newUsername" name="newUsername" placeholder="Choose a username">
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">
+                            <i class="fas fa-lock"></i> Password
+                        </label>
+                        <input type="password" id="newPassword" name="newPassword" autocomplete="new-password" placeholder="Choose a password">
+                    </div>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-user-plus"></i> Register
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Modern Web Application. All rights reserved.</p>
+    </footer>
+
+    <script type="module" src="/controllers/pageController.js"></script>
+</body>
+</html>

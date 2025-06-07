@@ -1,10 +1,11 @@
-import connectDB from './connection';
-import User from '../models/userModel';
-import StorageQuota from '../models/storageQuotaModel';
-import File from '../models/fileModel';
+import connectDB from './connection.js';
+import User from '../models/userModel.js';
+import StorageQuota from '../models/storageQuotaModel.js';
+import File from '../models/fileModel.js';
+import dbConfig from '../config/db.js';
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
-import dbConfig from '../config/db';
+
 
 const initializeDatabase = async (): Promise<void> => {
   try {
