@@ -1,12 +1,12 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-interface IUser extends Document{
-    firstName: String,
-    lastName: String,
-    username: String,
-    email: String,
-    password: String,
-    lastLogin?: Date,
+interface IUser extends Document {
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
+  password: string;
+  lastLogin?: Date;
 }
 
 const UserSchema: Schema = new Schema({

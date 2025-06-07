@@ -1,6 +1,6 @@
 import express from "express";
 import multer from "multer";
-import { uploadFile, downloadFile, deleteFile } from "../controllers/fileController";
+import { uploadFile, downloadFile, deleteFile, showDataInDirectory, previewFile } from "../controllers/fileController.js";
 
 
 
@@ -15,5 +15,11 @@ router.get("/download/:id", downloadFile);
 
 //File delete route
 router.get("/delete/:id", deleteFile);
+
+//Show files
+router.get("/directory/:directoryId?", showDataInDirectory);
+
+//Preview file
+router.get("/preview/:id", previewFile);
 
 export default router;
