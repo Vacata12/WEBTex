@@ -48,16 +48,24 @@ export const login = async (req: Request, res: Response) => {
   if (!isMatch)
     return res.status(401).json({ message: "Invalid credentials." });
 
-  // Обновяване на lastLogin
+  // Update lastLogin
   user.lastLogin = new Date();
   await user.save();
 
-  // Създаване на сесия (ако използваш express-session)
+  // Create session
   req.session.user = {
-    id: user._id,
+    id: user._id.toString(),
     username: user.username,
     email: user.email,
   };
 
-  res.status(200).json({ message: "Login successful." });
+  // Send response with user data
+  res.status(200).json({ 
+    message: "Login successful",
+    user: {
+      id: user._id,
+      username: user.username,
+      email: user.email
+    }
+  });
 };
