@@ -46,48 +46,20 @@
   <div id="search-results"></div>
 
   <script type="module">
-    import { searchFiles, mockFiles } from '../src/utils/fileSearch.ts';
+    import { handleSearch } from '../src/utils/fileSearch.ts';
+    import { mockFiles } from '../src/utils/fileSearch.ts';
   
     document.addEventListener('DOMContentLoaded', () => {
-      const searchInput = document.getElementById('search-input');
-      const resultsContainer = document.getElementById('search-results');
-      let debounceTimeout;
+      const searchInput = document.getElementById('search-input'); // Вземане на елемента за търсене
+      const resultsContainer = document.getElementById('search-results'); // Вземане на контейнера за резултати
   
-      // Function to render search results with additional details
-      const renderResults = (results) => {
-        resultsContainer.innerHTML = ''; // Clear previous results
-        results.forEach(file => {
-          const item = document.createElement('div');
-          item.className = 'dropdown-item';
-          item.innerHTML = `
-            <strong>${file.name}</strong> (${file.type})<br>
-            <small>Path: ${file.path}</small><br>
-            <small>Size: ${file.size || 'N/A'} bytes</small><br>
-            <small>Last Modified: ${new Date(file.lastModified).toLocaleString()}</small>
-          `;
-          resultsContainer.appendChild(item);
-        });
-      };
-  
-      // Event listener for input changes with debounce
-      searchInput.addEventListener('input', () => {
-        const searchTerm = searchInput.value.trim();
-  
-        // Clear the previous timeout
-        clearTimeout(debounceTimeout);
-  
-        // Set a new timeout to delay the search
-        debounceTimeout = setTimeout(() => {
-          if (searchTerm) {
-            const results = searchFiles(mockFiles, searchTerm);
-            renderResults(results);
-            resultsContainer.classList.add('active');
-          } else {
-            resultsContainer.classList.remove('active');
-            resultsContainer.innerHTML = ''; // Clear results
-          }
-        }, 300); // Delay of 300ms
-      });
+      // Проверка дали елементите съществуват
+      if (searchInput && resultsContainer) {
+        // Инициализиране на логиката за търсене
+        handleSearch(searchInput, resultsContainer, mockFiles);
+      } else {
+        console.error('Неуспешно намиране на елементите search-input или search-results.');
+      }
     });
   </script>
 </body>
