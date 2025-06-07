@@ -1,4 +1,4 @@
-import app from "./app";
+import app from "./serverApp";
 import connectDB from "./db/connection";
 import dotenv from "dotenv";
 
