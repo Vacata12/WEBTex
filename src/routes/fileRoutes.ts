@@ -1,25 +1,30 @@
 import express from "express";
 import multer from "multer";
-import { uploadFile, downloadFile, deleteFile, showDataInDirectory, previewFile } from "../controllers/fileController.js";
-
-
+import { uploadFile, downloadFile, deleteFile, showDataInDirectory, previewFile, createDirectory, getDirectoryPath } from "../controllers/fileController.js";
+import { isAuthenticated } from "../middlewares/errorHandler.js";
 
 const router = express.Router();
-const upload = multer({ storage: multer.memoryStorage() });// Configure multer as needed
+const upload = multer({ storage: multer.memoryStorage() });
 
-// File upload route
+// Apply authentication middleware to all routes
+router.use(isAuthenticated);
+
+// Add user data to request before file operations
+router.use((req, res, next) => {
+    if (req.session?.user) {
+        req.user = {
+            _id: req.session.user.id
+        };
+    }
+    next();
+});
+
 router.post("/upload", upload.single("uploadFile"), uploadFile);
-
-//File download route
 router.get("/download/:id", downloadFile);
-
-//File delete route
-router.get("/delete/:id", deleteFile);
-
-//Show files
+router.delete("/delete/:id", deleteFile); // Changed from GET to DELETE
 router.get("/directory/:directoryId?", showDataInDirectory);
-
-//Preview file
 router.get("/preview/:id", previewFile);
+router.post("/directory", createDirectory);
+router.get("/path/:directoryId", getDirectoryPath);
 
 export default router;

@@ -12,7 +12,7 @@
     <header>
         <div class="header-content">
             <h1><i class="fas fa-code"></i> Modern Web Application</h1>
-            <nav>
+            <nav id="guest-nav">
                 <a href="#" onclick="window.showPage('home')" class="nav-link">
                     <i class="fas fa-home"></i> Home
                 </a>
@@ -26,10 +26,19 @@
                     <i class="fas fa-user-plus"></i> Register
                 </a>
             </nav>
+            <nav id="user-nav" style="display: none;">
+                <span class="user-greeting">
+                    <i class="fas fa-user"></i> Hello <span id="username-display"></span>
+                </span>
+                <a href="#" onclick="handleLogout()" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </nav>
         </div>
     </header>
 
     <main>
+        <!-- Home Page -->
         <div id="home" class="page" style="display: block;">
             <div class="page-content">
                 <h2><i class="fas fa-rocket"></i> Welcome to the Future</h2>
@@ -54,6 +63,47 @@
             </div>
         </div>
 
+        <!-- Dashboard Page (for logged-in users) -->
+        <div id="dashboard" class="page" style="display: none;">
+            <div class="page-content">
+                <div class="files-container">
+                    <!-- Add breadcrumb navigation -->
+                    <div id="breadcrumb" class="breadcrumb">
+                        <!-- Breadcrumb will be populated dynamically -->
+                    </div>
+                    
+                    <div class="storage-info">
+                        <div class="storage-text">
+                            Storage used: <span id="usedStorage">0</span> GB of <span id="totalStorage">15</span> GB
+                        </div>
+                        <div class="storage-bar">
+                            <div id="storageUsed" class="storage-used" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="files-header">
+                        <div class="file-column">Name</div>
+                        <div class="file-column">Modified</div>
+                        <div class="file-column">Size</div>
+                        <div class="file-column">Actions</div>
+                    </div>
+                    <div id="filesList" class="files-list">
+                        <!-- Files will be listed here dynamically -->
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn-primary" onclick="showUploadModal()">
+                        <i class="fas fa-upload"></i> Upload File
+                    </button>
+                    <button class="btn-primary" onclick="showCreateDirectoryModal()">
+                        <i class="fas fa-folder-plus"></i> Create Directory
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Page -->
         <div id="about" class="page" style="display: none;">
             <div class="page-content">
                 <h2><i class="fas fa-users"></i> About Us</h2>
@@ -78,6 +128,7 @@
             </div>
         </div>
 
+        <!-- Login Page -->
         <div id="login" class="page" style="display: none;">
             <div class="page-content">
                 <h2><i class="fas fa-sign-in-alt"></i> Login</h2>
@@ -101,25 +152,96 @@
             </div>
         </div>
 
+        <!-- Register Page -->
         <div id="register" class="page" style="display: none;">
             <div class="page-content">
                 <h2><i class="fas fa-user-plus"></i> Register</h2>
                 <form class="auth-form">
                     <div class="form-group">
+                        <label for="firstName">
+                            <i class="fas fa-user"></i> First Name
+                        </label>
+                        <input type="text" id="firstName" name="firstName" placeholder="Enter your first name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">
+                            <i class="fas fa-user"></i> Last Name
+                        </label>
+                        <input type="text" id="lastName" name="lastName" placeholder="Enter your last name" required>
+                    </div>
+                    <div class="form-group">
                         <label for="newUsername">
                             <i class="fas fa-user"></i> Username
                         </label>
-                        <input type="text" id="newUsername" name="newUsername" placeholder="Choose a username">
+                        <input type="text" id="newUsername" name="newUsername" placeholder="Choose a username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">
+                            <i class="fas fa-envelope"></i> Email
+                        </label>
+                        <input type="email" id="email" name="email" placeholder="Enter your email" required>
                     </div>
                     <div class="form-group">
                         <label for="newPassword">
                             <i class="fas fa-lock"></i> Password
                         </label>
-                        <input type="password" id="newPassword" name="newPassword" autocomplete="new-password" placeholder="Choose a password">
+                        <input type="password" id="newPassword" name="newPassword" placeholder="Choose a password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">
+                            <i class="fas fa-lock"></i> Confirm Password
+                        </label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
                     </div>
                     <button type="submit" class="btn-primary">
                         <i class="fas fa-user-plus"></i> Register
                     </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Upload Modal -->
+        <div id="uploadModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3><i class="fas fa-upload"></i> Upload File</h3>
+                <form id="uploadForm" class="upload-form">
+                    <div class="form-group">
+                        <label for="fileInput">
+                            <i class="fas fa-file"></i> Choose File
+                        </label>
+                        <input type="file" id="fileInput" name="uploadFile" required>
+                    </div>
+                    <div class="modal-buttons">
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-upload"></i> Upload
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="closeModal('uploadModal')">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Create Directory Modal -->
+        <div id="directoryModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3><i class="fas fa-folder-plus"></i> New Directory</h3>
+                <form id="directoryForm" class="directory-form">
+                    <div class="form-group">
+                        <label for="directoryName">
+                            <i class="fas fa-folder"></i> Directory Name
+                        </label>
+                        <input type="text" id="directoryName" name="name" required placeholder="Enter directory name">
+                    </div>
+                    <div class="modal-buttons">
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-check"></i> Create
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="closeModal('directoryModal')">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -129,6 +251,6 @@
         <p>&copy; 2025 Modern Web Application. All rights reserved.</p>
     </footer>
 
-    <script type="module" src="/controllers/pageController.js"></script>
+    <script src="index.js"></script>
 </body>
 </html>
