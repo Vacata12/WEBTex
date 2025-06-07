@@ -2,6 +2,28 @@ import express from "express";
 import bcrypt from "bcryptjs";
 import User from "../models/userModel"; // моделът от MongoDB
 
+// Add this import if you use express-session
+import session from "express-session";
+
+// Extend Express Request interface to include session
+declare module "express-session" {
+  interface SessionData {
+    user?: {
+      id: string;
+      username: string;
+      email: string;
+    };
+  }
+}
+
+declare global {
+  namespace Express {
+    interface Request {
+      session: session.Session & Partial<session.SessionData>;
+    }
+  }
+}
+
 const router = express.Router();
 
 // 📌 POST /api/auth/register
