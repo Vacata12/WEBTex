@@ -81,7 +81,6 @@ const FileSchema: Schema = new Schema({
     timestamps: true
 });
 
-
 FileSchema.index({ owner: 1, path: 1 }, { unique: true });
 FileSchema.index({ parent: 1 });
 FileSchema.index({ owner: 1 });
