@@ -306,6 +306,37 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 });
 
+async function initializeSearch() {
+    const searchInput = document.getElementById('fileSearch');
+    const searchResults = document.getElementById('searchResults');
+    
+    if (!searchInput || !searchResults) {
+        console.error('Search elements not found');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/files/all', {
+            credentials: 'include'
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch files for search');
+        }
+        
+        const data = await response.json();
+        const files = data.items || [];
+        
+        // Import the search utilities
+        const { handleSearch } = await import('./utils/fileSearch.js');
+        
+        // Initialize search handler
+        handleSearch(searchInput, searchResults, files);
+    } catch (error) {
+        console.error('Error initializing search:', error);
+    }
+}
+
 function getCurrentDirectoryId() {
     return currentDirectoryId;
 }
@@ -333,6 +364,51 @@ function updateUIForAuthState(user) {
         userNav.style.display = 'flex';
         dashboardPage.style.display = 'block';
         usernameDisplay.textContent = user.username;
+
+        // Load user's files
+        loadFiles();
+    } else {
+        // Show guest elements
+        guestNav.style.display = 'flex';
+        homePage.style.display = 'block';
+
+        // Hide user elements
+        userNav.style.display = 'none';
+        dashboardPage.style.display = 'none';
+        usernameDisplay.textContent = '';
+
+        // Hide other pages
+        loginPage.style.display = 'none';
+        registerPage.style.display = 'none';
+        aboutPage.style.display = 'none';
+    }
+}
+
+function updateUIForAuthState(user) {
+    const guestNav = document.getElementById('guest-nav');
+    const userNav = document.getElementById('user-nav');
+    const usernameDisplay = document.getElementById('username-display');
+    const dashboardPage = document.getElementById('dashboard');
+    const homePage = document.getElementById('home');
+    const loginPage = document.getElementById('login');
+    const registerPage = document.getElementById('register');
+    const aboutPage = document.getElementById('about');
+
+    if (user) {
+        // Hide all guest-related elements
+        guestNav.style.display = 'none';
+        homePage.style.display = 'none';
+        loginPage.style.display = 'none';
+        registerPage.style.display = 'none';
+        aboutPage.style.display = 'none';
+
+        // Show user-related elements
+        userNav.style.display = 'flex';
+        dashboardPage.style.display = 'block';
+        usernameDisplay.textContent = user.username;
+
+        // Initialize search functionality
+        initializeSearch();
 
         // Load user's files
         loadFiles();
@@ -489,3 +565,4 @@ window.downloadFile = downloadFile;
 window.deleteFile = deleteFile;
 window.handleLogout = handleLogout;
 window.loadFiles = loadFiles;
+window.initializeSearch = initializeSearch;
