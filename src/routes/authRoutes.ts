@@ -1,11 +1,11 @@
 import express from "express";
 import bcrypt from "bcryptjs";
-import User from "../models/userModel.js"; // моделът от MongoDB
+import User from "../models/userModel.js";
 
-// Add this import if you use express-session
+
 import session from "express-session";
 
-// Extend Express Request interface to include session
+
 declare module "express-session" {
   interface SessionData {
     user?: {
@@ -26,7 +26,7 @@ declare global {
 
 const router = express.Router();
 
-// 📌 POST /api/auth/register
+
 router.post("/register", async (req, res) => {
   const { firstName, lastName, username, email, password, confirmPassword } = req.body;
 
@@ -58,7 +58,7 @@ router.post("/register", async (req, res) => {
   res.status(201).json({ message: "Registered successfully" });
 });
 
-// 📌 POST /api/auth/login
+
 router.post("/login", async (req, res) => {
     const { username, password } = req.body;
 
@@ -72,7 +72,7 @@ router.post("/login", async (req, res) => {
             return res.status(401).json({ message: "Invalid credentials" });
         }
 
-        // Update session
+        
         req.session.user = {
             id: user._id.toString(),
             username: user.username,
@@ -94,7 +94,7 @@ router.post("/login", async (req, res) => {
     }
 });
 
-// 📌 GET /api/auth/me
+
 router.get("/me", (req, res) => {
   if (req.session.user) {
     res.json({ user: req.session.user });
@@ -103,7 +103,7 @@ router.get("/me", (req, res) => {
   }
 });
 
-// 📌 POST /api/auth/logout
+
 router.post("/logout", (req, res) => {
   req.session.destroy(() => {
     res.status(200).json({ message: "Logged out" });

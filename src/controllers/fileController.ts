@@ -1,28 +1,22 @@
 import { Request, Response } from "express";
-import fileModel from "../models/fileModel.js";
+import fileModel, { IFile } from "../models/fileModel.js";
 import mongoose from "mongoose";
-import IFile from "../models/fileModel.js";
-import { fileTypeFromBlob, fileTypeFromBuffer } from "file-type";
 
-// Extend Express Request interface to include 'user'
 declare global {
     namespace Express {
         interface User {
             _id: mongoose.Types.ObjectId | string;
-            // add other user properties if needed
         }
+        
         interface Request {
             user?: User;
+            file?: Express.Multer.File;
         }
     }
 }
 
-interface MulterRequest extends Request {
-    file?: Express.Multer.File;
-}
 
 
-//upload file to db
 export const uploadFile = async (req: Request, res: Response): Promise<void> => {
     try {
         if(!req.file) {
@@ -39,10 +33,9 @@ export const uploadFile = async (req: Request, res: Response): Promise<void> => 
 
         const { originalname, mimetype, size, buffer } = req.file as Express.Multer.File;
 
-        // Generate a unique path by including the filename
+
         const uniquePath = `/${req.body.parent || 'root'}/${originalname}`;
 
-        // Check if file already exists in this path
         const existingFile = await fileModel.findOne({
             owner: new mongoose.Types.ObjectId(userId),
             path: uniquePath,
@@ -50,7 +43,6 @@ export const uploadFile = async (req: Request, res: Response): Promise<void> => 
         });
 
         if (existingFile) {
-            // Update existing file instead of creating new one
             existingFile.content = buffer.toString('base64');
             existingFile.size = size;
             existingFile.mimeType = mimetype;
@@ -93,7 +85,7 @@ export const uploadFile = async (req: Request, res: Response): Promise<void> => 
 }
 
 
-//Download File From db
+
 export const downloadFile = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
@@ -106,7 +98,7 @@ export const downloadFile = async (req: Request, res: Response): Promise<void> =
 
         const fileBuffer = Buffer.from(file.content || "", "base64");
 
-        // Handle special symbols in the name
+
         const encodedFileName = encodeURIComponent(file.originalName);
         console.log(encodedFileName)
 
@@ -218,7 +210,7 @@ export const createDirectory = async(req: Request, res: Response): Promise<void>
 export const showDataInDirectory = async(req: Request, res: Response): Promise<void> => {
     try {
         const { directoryId } = req.params;
-        // Get user ID from session
+
         const userId = req.session?.user?.id;
         
         if (!userId) {
@@ -278,25 +270,25 @@ function getFileCategory(mimeType: string): string {
     return 'binary';
 }
 
-export const previewFile = async(req: Request, res:Response): Promise<void> => {
+export const previewFile = async(req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
         const file = await fileModel.findById(id);
 
-        if(!file) {
+        if (!file) {
             res.status(404).send("File not found!");
-            return;            
+            return;
         }
 
         const fileBuffer = Buffer.from(file.content || "", "base64");
-        const fileType = await fileTypeFromBuffer(fileBuffer);
-        
         const fileCategory = getFileCategory(file.mimeType || "");
 
         switch (fileCategory) {
             case 'viewable':
                 // For files that can be viewed directly in browser (images, PDFs, text)
-                res.setHeader('Content-Type', file.mimeType || "");
+                if (file.mimeType) {
+                    res.setHeader('Content-Type', file.mimeType);
+                }
                 res.setHeader('Content-Disposition', 'inline');
                 res.send(fileBuffer);
                 break;
@@ -330,10 +322,10 @@ export const previewFile = async(req: Request, res:Response): Promise<void> => {
                     message: "Unknown file type",
                     type: file.mimeType
                 });
-        } 
-    }
-    catch (error) {
-        res.status(500).send("Error retrieving file content: " + error);
+        }
+    } catch (error) {
+        console.error('Error in previewFile:', error);
+        res.status(500).send("Error retrieving file content");
     }
 }
 

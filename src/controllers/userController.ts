@@ -1,15 +1,15 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
-import User from "../models/userModel"; // твоят модел
+import User from "../models/userModel"; 
 
-// 📌 POST /api/auth/register
+
 export const register = async (req: Request, res: Response) => {
   const { firstName, lastName, username, email, password } = req.body;
 
   if (!firstName || !lastName || !username || !email || !password)
     return res.status(400).json({ message: "All fields are required." });
 
-  // Проверки за уникалност
+
   const existingEmail = await User.findOne({ email });
   if (existingEmail)
     return res.status(400).json({ message: "Email already in use." });
@@ -18,7 +18,7 @@ export const register = async (req: Request, res: Response) => {
   if (existingUsername)
     return res.status(400).json({ message: "Username already taken." });
 
-  // Хеширане на парола
+
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const newUser = new User({
@@ -48,18 +48,17 @@ export const login = async (req: Request, res: Response) => {
   if (!isMatch)
     return res.status(401).json({ message: "Invalid credentials." });
 
-  // Update lastLogin
+
   user.lastLogin = new Date();
   await user.save();
 
-  // Create session
   req.session.user = {
     id: user._id.toString(),
     username: user.username,
     email: user.email,
   };
 
-  // Send response with user data
+
   res.status(200).json({ 
     message: "Login successful",
     user: {

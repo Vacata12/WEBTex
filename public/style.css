@@ -16,7 +16,7 @@ body {
 }
 
 header {
-    background: #2c3e50;
+    background: var(--primary-color);
     color: #ffffff;
     padding: 1rem 0;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
@@ -72,10 +72,6 @@ nav a:hover {
     transform: translateY(-2px);
 }
 
-.nav-link i {
-    font-size: 1.1rem;
-}
-
 .page {
     max-width: 800px;
     margin: 2rem auto;
@@ -108,7 +104,8 @@ form {
 }
 
 input[type="text"],
-input[type="password"] {
+input[type="password"],
+input[type="file"] {
     width: 100%;
     padding: 0.8rem;
     margin: 0.5rem 0 1rem;
@@ -119,7 +116,8 @@ input[type="password"] {
 }
 
 input[type="text"]:focus,
-input[type="password"]:focus {
+input[type="password"]:focus,
+input[type="file"]:focus {
     border-color: var(--secondary-color);
     outline: none;
 }
@@ -151,8 +149,6 @@ label {
     line-height: 1.6;
     margin-bottom: 1.5rem;
 }
-
-/* Add these styles to your existing CSS */
 
 .modal {
     display: none;
@@ -190,31 +186,20 @@ label {
     border-radius: 4px;
 }
 
-.form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
-}
-
 .action-buttons {
     margin: 20px 0;
     display: flex;
     gap: 10px;
+    justify-content: center;
 }
 
 .files-container {
-    margin-top: 20px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    margin: 2rem auto;
+    max-width: 1200px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     padding: 20px;
-}
-
-.modal-buttons {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
 }
 
 .btn-secondary {
@@ -230,7 +215,6 @@ label {
     background-color: #5a6268;
 }
 
-/* Header and Navigation */
 .header-content {
     max-width: 1200px;
     margin: 0 auto;
@@ -253,41 +237,13 @@ label {
     gap: 1.5rem;
 }
 
-.user-greeting i {
-    color: #3498db;
-}
-
-/* File Container */
-.files-container {
-    margin: 2rem auto;
-    max-width: 1200px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-/* Action Buttons */
-.action-buttons {
-    margin: 2rem auto;
-    max-width: 1200px;
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-}
-
-.btn-primary {
-    padding: 0.75rem 1.5rem;
-    font-size: 1.1rem;
-}
-
 #username-display {
-    color: #3498db;
+    color: var(--secondary-color);
     font-weight: 600;
 }
 
-/* Logout button specific styling */
 .nav-link[onclick*="handleLogout"] {
-    background: #e74c3c;
+    background: var(--accent-color);
     color: white;
     padding: 0.5rem 1.2rem;
 }
@@ -297,7 +253,6 @@ label {
     transform: translateY(-2px);
 }
 
-/* Add these styles */
 .breadcrumb {
     padding: 10px;
     margin-bottom: 20px;
@@ -326,51 +281,96 @@ label {
 }
 
 .search-container {
-  margin: 20px 0;
-  width: 100%;
+    margin: 20px 0;
+    width: 100%;
 }
 
 .search-wrapper {
-  position: relative;
-  max-width: 600px;
-  margin: 0 auto;
+    position: relative;
+    max-width: 600px;
+    margin: 0 auto;
 }
 
 .search-input {
-  width: 100%;
-  padding: 10px 15px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 16px;
-  outline: none;
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    outline: none;
 }
 
 .search-results-dropdown {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  margin-top: 5px;
-  max-height: 300px;
-  overflow-y: auto;
-  z-index: 1000;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-top: 5px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .search-results-dropdown.active {
-  display: block;
+    display: block;
 }
 
 .dropdown-item {
-  padding: 10px 15px;
-  border-bottom: 1px solid #eee;
-  cursor: pointer;
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
 }
 
 .dropdown-item:hover {
-  background-color: #f5f5f5;
+    background-color: #f5f5f5;
+}
+
+.file-item {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.file-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.file-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.action-button {
+    background: var(--secondary-color);
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.action-button:hover {
+    background: var(--primary-color);
+}
+
+.delete-btn {
+    background: var(--accent-color);
+}
+
+.delete-btn:hover {
+    background: #c0392b;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 20px;
+    color: #666;
 }

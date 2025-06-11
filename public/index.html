@@ -3,256 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Web Application</title>
+    <title>Personal Cloud</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
         <div class="header-content">
-            <h1><i class="fas fa-code"></i> Personal Clould</h1>
+            <h1>Personal Cloud</h1>
             <nav id="guest-nav">
-                <a href="#" onclick="window.showPage('home')" class="nav-link">
-                    <i class="fas fa-home"></i> Home
-                </a>
-                <a href="#" onclick="window.showPage('about')" class="nav-link">
-                    <i class="fas fa-info-circle"></i> About
-                </a>
-                <a href="#" onclick="window.showPage('login')" class="nav-link">
-                    <i class="fas fa-sign-in-alt"></i> Login
-                </a>
-                <a href="#" onclick="window.showPage('register')" class="nav-link">
-                    <i class="fas fa-user-plus"></i> Register
-                </a>
+                <a href="#" onclick="showPage('home')" class="nav-link">Home</a>
+                <a href="#" onclick="showPage('about')" class="nav-link">About</a>
+                <a href="#" onclick="showPage('login')" class="nav-link">Login</a>
+                <a href="#" onclick="showPage('register')" class="nav-link">Register</a>
             </nav>
             <nav id="user-nav" style="display: none;">
-                <span class="user-greeting">
-                    <i class="fas fa-user"></i> Hello <span id="username-display"></span>
-                </span>
-                <a href="#" onclick="handleLogout()" class="nav-link">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </a>
+                <span class="user-greeting">Hello <span id="username-display"></span></span>
+                <a href="#" onclick="handleLogout()" class="nav-link">Logout</a>
             </nav>
         </div>
     </header>
 
     <main>
-        <!-- Home Page -->
-        <div id="home" class="page" style="display: block;">
-            <div class="page-content">
-                <h2><i class="fas fa-rocket"></i> Welcome to the Cloulds</h2>
-                <p class="feature-text">Experience the next generation in the skies.</p>
-                <div class="features">
-                    <div class="feature-card">
-                        <i class="fas fa-bolt"></i>
-                        <h3>Lightning Fast</h3>
-                        <p>Optimized for speed and performance</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fas fa-shield-alt"></i>
-                        <h3>Secure</h3>
-                        <p>Built with security in mind</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fas fa-mobile-alt"></i>
-                        <h3>Responsive</h3>
-                        <p>Works on all devices</p>
-                    </div>
+        <section id="home" class="page">
+            <h2>Welcome to the Cloud</h2>
+            <p>Experience the next generation of cloud storage.</p>
+            <div class="features">
+                <div class="feature">
+                    <h3>Lightning Fast</h3>
+                    <p>Optimized for speed and performance</p>
+                </div>
+                <div class="feature">
+                    <h3>Secure</h3>
+                    <p>Built with security in mind</p>
+                </div>
+                <div class="feature">
+                    <h3>Responsive</h3>
+                    <p>Works on all devices</p>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Dashboard Page (for logged-in users) -->
-        <div id="dashboard" class="page" style="display: none;">
-            <div class="page-content">
-                <div class="files-container">
-                    <!-- Add breadcrumb navigation -->
-                    <div id="breadcrumb" class="breadcrumb">
-                        <!-- Breadcrumb will be populated dynamically -->
-                    </div>
-                    
-                    <div class="storage-info">
-                        <div class="storage-text">
-                            Storage used: <span id="usedStorage">0</span> GB of <span id="totalStorage">15</span> GB
-                        </div>
-                        <div class="storage-bar">
-                            <div id="storageUsed" class="storage-used" style="width: 0%"></div>
-                        </div>
-                    </div>
-
-                    <div class="search-container">
-                      <div class="search-wrapper">
-                        <input 
-                          type="text" 
-                          id="fileSearch" 
-                          class="search-input" 
-                          placeholder="Search files..."
-                        >
-                        <div id="searchResults" class="search-results-dropdown"></div>
-                      </div>
-                    </div>
-                    
-                    <div class="files-header">
-                        <div class="file-column">Name</div>
-                        <div class="file-column">Modified</div>
-                        <div class="file-column">Size</div>
-                        <div class="file-column">Actions</div>
-                    </div>
-                    <div id="filesList" class="files-list">
-                        <!-- Files will be listed here dynamically -->
+        <section id="dashboard" class="page" style="display: none;">
+            <div class="search-container">
+                <div class="search-wrapper">
+                    <input type="text" id="fileSearch" class="search-input" placeholder="Search files...">
+                    <div id="searchResults" class="search-results-dropdown"></div>
+                </div>
+            </div>
+            <div class="files-container">
+                <div class="storage-info">
+                    <p>Storage used: <span id="usedStorage">0</span> GB of <span id="totalStorage">15</span> GB</p>
+                    <div class="progress-bar">
+                        <div id="storageUsed" style="width: 0%;"></div>
                     </div>
                 </div>
-                
+                <div class="file-list-header">
+                    <div>Name</div>
+                    <div>Modified</div>
+                    <div>Size</div>
+                    <div>Actions</div>
+                </div>
+                <div id="filesList"></div>
                 <div class="action-buttons">
-                    <button class="btn-primary" onclick="showUploadModal()">
-                        <i class="fas fa-upload"></i> Upload File
-                    </button>
-                    <button class="btn-primary" onclick="showCreateDirectoryModal()">
-                        <i class="fas fa-folder-plus"></i> Create Directory
-                    </button>
+                    <button class="action-button" onclick="showUploadModal()">Upload File</button>
+                    <button class="action-button" onclick="showCreateDirectoryModal()">Create Directory</button>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- About Page -->
-        <div id="about" class="page" style="display: none;">
-            <div class="page-content">
-                <h2><i class="fas fa-users"></i> About Us</h2>
-                <div class="about-content">
-                    <div class="about-text">
-                        <p>We are a team of passionate students.</p>
-                        <p>Our mission is to pass our finals.</p>
-                    </div>
-                    <div class="team-stats">
-                        <div class="stat-card">
-                            <i class="fas fa-project-diagram"></i>
-                            <h4>100+</h4>
-                            <p>Projects Completed</p>
-                        </div>
-                        <div class="stat-card">
-                            <i class="fas fa-smile-beam"></i>
-                            <h4>500+</h4>
-                            <p>Happy Clients</p>
-                        </div>
-                    </div>
+        <section id="about" class="page" style="display: none;">
+            <h2>About Us</h2>
+            <p>We are a team of passionate students.</p>
+            <p>Our mission is to pass our finals.</p>
+            <div class="stats">
+                <div class="stat">
+                    <h3>100+</h3>
+                    <p>Projects Completed</p>
+                </div>
+                <div class="stat">
+                    <h3>500+</h3>
+                    <p>Happy Clients</p>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Login Page -->
-        <div id="login" class="page" style="display: none;">
-            <div class="page-content">
-                <h2><i class="fas fa-sign-in-alt"></i> Login</h2>
-                <form class="auth-form">
-                    <div class="form-group">
-                        <label for="username">
-                            <i class="fas fa-user"></i> Username
-                        </label>
-                        <input type="text" id="username" name="username" placeholder="Enter your username">
-                    </div>
-                    <div class="form-group">
-                        <label for="password">
-                            <i class="fas fa-lock"></i> Password
-                        </label>
-                        <input type="password" id="password" name="password" autocomplete="current-password" placeholder="Enter your password">
-                    </div>
-                    <button type="submit" class="btn-primary">
-                        <i class="fas fa-sign-in-alt"></i> Login
-                    </button>
-                </form>
-            </div>
-        </div>
+        <section id="login" class="page" style="display: none;">
+            <h2>Login</h2>
+            <form>
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <input type="submit" value="Login">
+            </form>
+        </section>
 
-        <!-- Register Page -->
-        <div id="register" class="page" style="display: none;">
-            <div class="page-content">
-                <h2><i class="fas fa-user-plus"></i> Register</h2>
-                <form class="auth-form">
-                    <div class="form-group">
-                        <label for="firstName">
-                            <i class="fas fa-user"></i> First Name
-                        </label>
-                        <input type="text" id="firstName" name="firstName" placeholder="Enter your first name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="lastName">
-                            <i class="fas fa-user"></i> Last Name
-                        </label>
-                        <input type="text" id="lastName" name="lastName" placeholder="Enter your last name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="newUsername">
-                            <i class="fas fa-user"></i> Username
-                        </label>
-                        <input type="text" id="newUsername" name="newUsername" placeholder="Choose a username" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">
-                            <i class="fas fa-envelope"></i> Email
-                        </label>
-                        <input type="email" id="email" name="email" placeholder="Enter your email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="newPassword">
-                            <i class="fas fa-lock"></i> Password
-                        </label>
-                        <input type="password" id="newPassword" name="newPassword" placeholder="Choose a password" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="confirmPassword">
-                            <i class="fas fa-lock"></i> Confirm Password
-                        </label>
-                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
-                    </div>
-                    <button type="submit" class="btn-primary">
-                        <i class="fas fa-user-plus"></i> Register
-                    </button>
-                </form>
-            </div>
-        </div>
+        <section id="register" class="page" style="display: none;">
+            <h2>Register</h2>
+            <form>
+                <div class="form-group">
+                    <label for="firstName">First Name</label>
+                    <input type="text" id="firstName" required>
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Last Name</label>
+                    <input type="text" id="lastName" required>
+                </div>
+                <div class="form-group">
+                    <label for="newUsername">Username</label>
+                    <input type="text" id="newUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="text" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">Password</label>
+                    <input type="password" id="newPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" required>
+                </div>
+                <input type="submit" value="Register">
+            </form>
+        </section>
 
-        <!-- Upload Modal -->
-        <div id="uploadModal" class="modal" style="display: none;">
+        <div id="uploadModal" class="modal">
             <div class="modal-content">
-                <h3><i class="fas fa-upload"></i> Upload File</h3>
-                <form id="uploadForm" class="upload-form">
+                <h2>Upload File</h2>
+                <form id="uploadForm">
                     <div class="form-group">
-                        <label for="fileInput">
-                            <i class="fas fa-file"></i> Choose File
-                        </label>
-                        <input type="file" id="fileInput" name="uploadFile" required>
+                        <label for="fileInput">Choose File</label>
+                        <input type="file" id="fileInput" required>
                     </div>
-                    <div class="modal-buttons">
-                        <button type="submit" class="btn-primary">
-                            <i class="fas fa-upload"></i> Upload
-                        </button>
-                        <button type="button" class="btn-secondary" onclick="closeModal('uploadModal')">
-                            <i class="fas fa-times"></i> Cancel
-                        </button>
+                    <div>
+                        <input type="submit" value="Upload">
+                        <button type="button" class="btn-secondary" onclick="closeModal('uploadModal')">Cancel</button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- Create Directory Modal -->
-        <div id="directoryModal" class="modal" style="display: none;">
+        <div id="directoryModal" class="modal">
             <div class="modal-content">
-                <h3><i class="fas fa-folder-plus"></i> New Directory</h3>
-                <form id="directoryForm" class="directory-form">
+                <h2>New Directory</h2>
+                <form id="directoryForm">
                     <div class="form-group">
-                        <label for="directoryName">
-                            <i class="fas fa-folder"></i> Directory Name
-                        </label>
-                        <input type="text" id="directoryName" name="name" required placeholder="Enter directory name">
+                        <label for="directoryName">Directory Name</label>
+                        <input type="text" id="directoryName" required>
                     </div>
-                    <div class="modal-buttons">
-                        <button type="submit" class="btn-primary">
-                            <i class="fas fa-check"></i> Create
-                        </button>
-                        <button type="button" class="btn-secondary" onclick="closeModal('directoryModal')">
-                            <i class="fas fa-times"></i> Cancel
-                        </button>
+                    <div>
+                        <input type="submit" value="Create">
+                        <button type="button" class="btn-secondary" onclick="closeModal('directoryModal')">Cancel</button>
                     </div>
                 </form>
             </div>
@@ -260,7 +167,7 @@
     </main>
 
     <footer>
-        <p>&copy; FMI Rights.</p>
+        <p>© FMI Rights.</p>
     </footer>
 
     <script src="index.js"></script>

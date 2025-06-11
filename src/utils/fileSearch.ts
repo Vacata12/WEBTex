@@ -1,5 +1,5 @@
-import type { IFile } from "../models/fileModel.js"; // Импортиране на интерфейса IFile като тип
-import mongoose from "mongoose"; // Импортиране на mongoose за тип ObjectId
+import type { IFile } from "../models/fileModel.js";
+import mongoose from "mongoose";
 /**
  * Функция за търсене на файлове по зададен шаблон.
  * @param files - Списък от файлове, в който се извършва търсенето.
@@ -7,16 +7,16 @@ import mongoose from "mongoose"; // Импортиране на mongoose за т
  * @returns Списък от файлове, които съответстват на шаблона за търсене.
  */
 export function searchFiles(files: Partial<IFile>[], pattern: string): Partial<IFile>[] {
-  const searchTerm = pattern.trim().toLowerCase(); // Премахване на празни пространства и преобразуване в малки букви
-  if (!searchTerm) return []; // Ако шаблонът е празен, връща празен списък
+  const searchTerm = pattern.trim().toLowerCase(); 
+  if (!searchTerm) return []; 
 
-  // Проверка дали шаблонът съдържа '/'
+  
   if (searchTerm.includes('/')) {
-    // Филтриране по пълния път
+    
     return files.filter(file => file.path?.toLowerCase().includes(searchTerm));
   }
 
-  // Филтриране по име на файл
+  
   return files.filter(file => file.name?.toLowerCase().includes(searchTerm));
 }
 
@@ -56,18 +56,18 @@ export const handleSearch = (
   searchInput.addEventListener('input', () => {
     const searchTerm = searchInput.value.trim();
 
-    // Изчистване на предишния таймаут
+    
     clearTimeout(debounceTimeout);
 
-    // Задаване на нов таймаут за забавяне на търсенето
+    
     debounceTimeout = window.setTimeout(() => {
       if (searchTerm) {
-        const results = searchFiles(files, searchTerm); // Извикване на функцията за търсене
-        renderResults(results, resultsContainer); // Рендиране на резултатите
+        const results = searchFiles(files, searchTerm); 
+        renderResults(results, resultsContainer); 
         resultsContainer.classList.add('active');
       } else {
         resultsContainer.classList.remove('active');
-        resultsContainer.innerHTML = ''; // Изчистване на резултатите
+        resultsContainer.innerHTML = '';
       }
     }, 300); // Забавяне от 300ms
   });

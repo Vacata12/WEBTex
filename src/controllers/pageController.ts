@@ -1,4 +1,3 @@
-// Export the function declaration directly
 export function showPage(pageId: string): void {
     const pages = document.querySelectorAll('.page');
     pages.forEach(page => {
@@ -11,7 +10,6 @@ export function showPage(pageId: string): void {
     }
 }
 
-// Type declaration for global usage
 declare global {
     interface Window {
         showPage: typeof showPage;
